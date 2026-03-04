@@ -47,6 +47,7 @@ build cmake_object_order_depends_target_index: phony || .
 build CMakeFiles/index.dir/src/main.cpp.o: CXX_COMPILER__index_unscanned_ C$:/repo/Cengine/src/main.cpp || cmake_object_order_depends_target_index
   DEP_FILE = CMakeFiles\index.dir\src\main.cpp.o.d
   FLAGS = -std=gnu++20
+  INCLUDES = -IC:/repo/Cengine/vendor
   OBJECT_DIR = CMakeFiles\index.dir
   OBJECT_FILE_DIR = CMakeFiles\index.dir\src
   TARGET_SUPPORT_DIR = CMakeFiles\index.dir

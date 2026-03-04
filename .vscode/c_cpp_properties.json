@@ -8,8 +8,14 @@
         "C:/Users/jonas/dev/emsdk/upstream/emscripten/cache/sysroot/include",
         "C:/Users/jonas/dev/emsdk/upstream/emscripten/cache/sysroot/include/compat"
       ],
-      "defines": ["__EMSCRIPTEN__"],
-      "compilerPath": "C:/Users/jonas/dev/emsdk/upstream/emscripten/emcc",
+"defines": [
+    "__EMSCRIPTEN__",
+    "__EMSCRIPTEN_PTHREADS__",
+    "GL_ES_VERSION_3_0",
+    "__unix__",
+    "GL_GLEXT_PROTOTYPES"
+],
+      "compilerPath": "C:/mingw64/bin/g++.exe",
       "cppStandard": "c++20",
       "intelliSenseMode": "gcc-x64"
     }
