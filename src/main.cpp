@@ -30,6 +30,14 @@ const char *fragSrc = R"(#version 300 es
 
 GLuint vao;
 
+glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+
+GLuint program;
+GLint uView;
+GLint uProjection;
+
 GLuint compileShader(GLenum type, const char *src)
 {
     GLuint shader = glCreateShader(type);
@@ -38,8 +46,40 @@ GLuint compileShader(GLenum type, const char *src)
     return shader;
 }
 
+// Global key state
+bool keys[256] = {};
+
+// Keyboard callbacks
+EM_BOOL keyDown(int type, const EmscriptenKeyboardEvent *e, void *userData)
+{
+    keys[e->keyCode] = true;
+    return EM_TRUE;
+}
+
+EM_BOOL keyUp(int type, const EmscriptenKeyboardEvent *e, void *userData)
+{
+    keys[e->keyCode] = false;
+    return EM_TRUE;
+}
+
 void mainLoop()
 {
+    float speed = 0.05f;
+    if (keys[87])
+        cameraPos += speed * cameraFront; // W
+    if (keys[83])
+        cameraPos -= speed * cameraFront; // S
+    if (keys[65])
+        cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * speed; // A
+    if (keys[68])
+        cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * speed; // D
+
+    // Recalculate view matrix
+    glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+    glUniformMatrix4fv(uView, 1, GL_FALSE, glm::value_ptr(view));
+    printf("cameraPos: %f %f %f\n", cameraPos.x, cameraPos.y, cameraPos.z);
+
+    // Draw
     glClearColor(0.1f, 0.4f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
     glDrawArrays(GL_TRIANGLES, 0, 3);
@@ -64,15 +104,14 @@ int main()
     // Shader program
     GLuint vert = compileShader(GL_VERTEX_SHADER, vertSrc);
     GLuint frag = compileShader(GL_FRAGMENT_SHADER, fragSrc);
-    GLuint prog = glCreateProgram();
-    glAttachShader(prog, vert);
-    glAttachShader(prog, frag);
-    glLinkProgram(prog);
-    glUseProgram(prog);
+    program = glCreateProgram();
+    glAttachShader(program, vert);
+    glAttachShader(program, frag);
+    glLinkProgram(program);
+    glUseProgram(program);
 
-    // Camera matrices
-    GLint uView = glGetUniformLocation(prog, "uView");
-    GLint uProjection = glGetUniformLocation(prog, "uProjection");
+    uView = glGetUniformLocation(program, "uView");
+    uProjection = glGetUniformLocation(program, "uProjection");
 
     glm::mat4 view = glm::lookAt(
         glm::vec3(0.0f, 0.0f, 3.0f),
@@ -103,6 +142,9 @@ int main()
     glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
     glEnableVertexAttribArray(0);
+
+    emscripten_set_keydown_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, nullptr, EM_TRUE, keyDown);
+    emscripten_set_keyup_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, nullptr, EM_TRUE, keyUp);
 
     emscripten_set_main_loop(mainLoop, 0, 1);
 }
