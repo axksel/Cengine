@@ -5,6 +5,9 @@ set(CMAKE_CXX_STANDARD 20)
 
 add_executable(index src/main.cpp)
 
+#external stuff (Vendors?)
+target_include_directories(index PRIVATE vendor)
+
 # Emscripten-specific flags
 if(EMSCRIPTEN)
     set_target_properties(index PROPERTIES SUFFIX ".html")

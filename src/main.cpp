@@ -2,6 +2,7 @@
 #include <emscripten.h>
 #include <emscripten/html5.h>
 #include <stdio.h>
+#include <glm/glm.hpp>
 
 const char* vertSrc = R"(#version 300 es
     layout(location = 0) in vec2 aPos;
