@@ -4,12 +4,11 @@
     {
       "label": "Build WASM",
       "type": "shell",
-      "command": "emcmake cmake -B build -G ninja; cmake --build build",
+      "command": "emcmake cmake -B build -G Ninja; cmake --build build",
       "group": {
         "kind": "build",
         "isDefault": true
-      },
-      "problemMatcher": ["$gcc"]
+      }
     },
     {
       "label": "Serve",

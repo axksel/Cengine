@@ -16,7 +16,7 @@
 
 rule CXX_SCAN__index_
   depfile = $DEP_FILE
-  command = C:\WINDOWS\system32\cmd.exe /C ""C:/Users/jonas/dev/emsdk/upstream/emscripten/emscan-deps.bat" -format=p1689 -- C:\Users\jonas\dev\emsdk\upstream\emscripten\em++.bat $DEFINES $INCLUDES $FLAGS -x c++ $in -c -o $OBJ_FILE -MT $DYNDEP_INTERMEDIATE_FILE -MD -MF $DEP_FILE > $DYNDEP_INTERMEDIATE_FILE.tmp && "C:/Program Files/CMake/bin/cmake.exe" -E rename $DYNDEP_INTERMEDIATE_FILE.tmp $DYNDEP_INTERMEDIATE_FILE"
+  command = C:\WINDOWS\system32\cmd.exe /C ""C:/Users/Jonas/dev/emsdk/upstream/emscripten/emscan-deps.bat" -format=p1689 -- C:\Users\Jonas\dev\emsdk\upstream\emscripten\em++.bat $DEFINES $INCLUDES $FLAGS -x c++ $in -c -o $OBJ_FILE -MT $DYNDEP_INTERMEDIATE_FILE -MD -MF $DEP_FILE > $DYNDEP_INTERMEDIATE_FILE.tmp && "C:/Program Files/CMake/bin/cmake.exe" -E rename $DYNDEP_INTERMEDIATE_FILE.tmp $DYNDEP_INTERMEDIATE_FILE"
   description = Scanning $in for CXX dependencies
 
 
@@ -37,7 +37,7 @@ rule CXX_DYNDEP__index_
 rule CXX_COMPILER__index_scanned_
   depfile = $DEP_FILE
   deps = gcc
-  command = ${LAUNCHER}${CODE_CHECK}C:\Users\jonas\dev\emsdk\upstream\emscripten\em++.bat $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE @$DYNDEP_MODULE_MAP_FILE -o $out -c $in
+  command = ${LAUNCHER}${CODE_CHECK}C:\Users\Jonas\dev\emsdk\upstream\emscripten\em++.bat $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE @$DYNDEP_MODULE_MAP_FILE -o $out -c $in
   description = Building CXX object $out
 
 
@@ -47,7 +47,7 @@ rule CXX_COMPILER__index_scanned_
 rule CXX_COMPILER__index_unscanned_
   depfile = $DEP_FILE
   deps = gcc
-  command = ${LAUNCHER}${CODE_CHECK}C:\Users\jonas\dev\emsdk\upstream\emscripten\em++.bat $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out -c $in
+  command = ${LAUNCHER}${CODE_CHECK}C:\Users\Jonas\dev\emsdk\upstream\emscripten\em++.bat $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out -c $in
   description = Building CXX object $out
 
 
@@ -55,7 +55,7 @@ rule CXX_COMPILER__index_unscanned_
 # Rule for linking CXX executable.
 
 rule CXX_EXECUTABLE_LINKER__index_
-  command = C:\WINDOWS\system32\cmd.exe /C "$PRE_LINK && C:\Users\jonas\dev\emsdk\upstream\emscripten\em++.bat $FLAGS $LINK_FLAGS $in -o $TARGET_FILE $LINK_PATH $LINK_LIBRARIES && $POST_BUILD"
+  command = C:\WINDOWS\system32\cmd.exe /C "$PRE_LINK && C:\Users\Jonas\dev\emsdk\upstream\emscripten\em++.bat $FLAGS $LINK_FLAGS $in -o $TARGET_FILE $LINK_PATH $LINK_LIBRARIES && $POST_BUILD"
   description = Linking CXX executable $TARGET_FILE
   restat = $RESTAT
 
@@ -72,7 +72,7 @@ rule CUSTOM_COMMAND
 # Rule for re-running cmake.
 
 rule RERUN_CMAKE
-  command = "C:\Program Files\CMake\bin\cmake.exe" --regenerate-during-build -SC:\Users\jonas\repo\Cengine -BC:\Users\jonas\repo\Cengine\build
+  command = "C:\Program Files\CMake\bin\cmake.exe" --regenerate-during-build -SC:\repo\Cengine -BC:\repo\Cengine\build
   description = Re-running CMake...
   generator = 1
 
@@ -81,7 +81,7 @@ rule RERUN_CMAKE
 # Rule for cleaning all built files.
 
 rule CLEAN
-  command = C:\Users\jonas\repo\Cengine\ninja.exe $FILE_ARG -t clean $TARGETS
+  command = C:\Users\Jonas\dev\ninja.exe $FILE_ARG -t clean $TARGETS
   description = Cleaning all built files...
 
 
@@ -89,6 +89,6 @@ rule CLEAN
 # Rule for printing all primary targets available.
 
 rule HELP
-  command = C:\Users\jonas\repo\Cengine\ninja.exe -t targets
+  command = C:\Users\Jonas\dev\ninja.exe -t targets
   description = All primary targets available:
 
