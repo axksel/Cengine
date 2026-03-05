@@ -1,5 +1,7 @@
 # ninja log v7
-18	2135	7944097344867065	CMakeFiles/index.dir/src/main.cpp.o	f6d4856c526eade3
+42	8948	7944225909720209	CMakeFiles/index.dir/src/main.cpp.o	f6d4856c526eade3
 43	2543	7944097345118060	CMakeFiles/index.dir/src/mesh.cpp.o	60444fbd3058fbf4
-33	2864	7944097345015898	CMakeFiles/index.dir/src/renderer.cpp.o	779b053b256d306a
-2864	4045	7944097373280869	index.html	8f2be8753ed4e785
+40	2778	7944227474898457	CMakeFiles/index.dir/src/renderer.cpp.o	779b053b256d306a
+2779	3912	7944227502284726	index.html	8f2be8753ed4e785
+40	2801	7944228009769351	CMakeFiles/index.dir/src/renderer.cpp.o	779b053b256d306a
+2802	3986	7944228037401264	index.html	8f2be8753ed4e785

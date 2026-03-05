@@ -71,7 +71,7 @@ var ENVIRONMENT_IS_SHELL = !ENVIRONMENT_IS_WEB && !ENVIRONMENT_IS_NODE && !ENVIR
 
 // --pre-jses are emitted after the Module integration code, so that they can
 // refer to Module (if they choose; they can also define Module)
-// include: C:\Users\Jonas\AppData\Local\Temp\tmpocsjm7e1.js
+// include: C:\Users\Jonas\AppData\Local\Temp\tmpubjm66gu.js
 
   if (!Module['expectedDataFileDownloads']) Module['expectedDataFileDownloads'] = 0;
   Module['expectedDataFileDownloads']++;
@@ -201,25 +201,25 @@ Module['FS_createPath']("/", "shaders", true, true);
     }
 
     }
-    loadPackage({"files": [{"filename": "/models/animal-horse.obj", "start": 0, "end": 1206}, {"filename": "/models/triangle.obj", "start": 1206, "end": 1337}, {"filename": "/shaders/basic.frag", "start": 1337, "end": 1480}, {"filename": "/shaders/basic.vert", "start": 1480, "end": 1679}], "remote_package_size": 1679});
+    loadPackage({"files": [{"filename": "/models/animal-horse.obj", "start": 0, "end": 1206}, {"filename": "/models/triangle.obj", "start": 1206, "end": 1337}, {"filename": "/shaders/basic.frag", "start": 1337, "end": 1480}, {"filename": "/shaders/basic.vert", "start": 1480, "end": 1714}], "remote_package_size": 1714});
 
   })();
 
-// end include: C:\Users\Jonas\AppData\Local\Temp\tmpocsjm7e1.js
-// include: C:\Users\Jonas\AppData\Local\Temp\tmpjc2_hpm1.js
+// end include: C:\Users\Jonas\AppData\Local\Temp\tmpubjm66gu.js
+// include: C:\Users\Jonas\AppData\Local\Temp\tmp357oapfh.js
 
     // All the pre-js content up to here must remain later on, we need to run
     // it.
     if ((typeof ENVIRONMENT_IS_WASM_WORKER != 'undefined' && ENVIRONMENT_IS_WASM_WORKER) || (typeof ENVIRONMENT_IS_PTHREAD != 'undefined' && ENVIRONMENT_IS_PTHREAD) || (typeof ENVIRONMENT_IS_AUDIO_WORKLET != 'undefined' && ENVIRONMENT_IS_AUDIO_WORKLET)) Module['preRun'] = [];
     var necessaryPreJSTasks = Module['preRun'].slice();
-  // end include: C:\Users\Jonas\AppData\Local\Temp\tmpjc2_hpm1.js
-// include: C:\Users\Jonas\AppData\Local\Temp\tmprjqkqudv.js
+  // end include: C:\Users\Jonas\AppData\Local\Temp\tmp357oapfh.js
+// include: C:\Users\Jonas\AppData\Local\Temp\tmpm4nqboyn.js
 
     if (!Module['preRun']) throw 'Module.preRun should exist because file support used it; did a pre-js delete it?';
     necessaryPreJSTasks.forEach((task) => {
       if (Module['preRun'].indexOf(task) < 0) throw 'All preRun tasks that exist before user pre-js code should remain after; did you replace Module or modify Module.preRun?';
     });
-  // end include: C:\Users\Jonas\AppData\Local\Temp\tmprjqkqudv.js
+  // end include: C:\Users\Jonas\AppData\Local\Temp\tmpm4nqboyn.js
 
 
 var arguments_ = [];

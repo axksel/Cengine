@@ -17,6 +17,7 @@
 GLuint program;
 GLint uView;
 GLint uProjection;
+GLint uModel;
 Mesh mesh;
 
 std::string loadFile(const std::string &path)
@@ -52,6 +53,7 @@ void initRenderer()
 
     uView = glGetUniformLocation(program, "uView");
     uProjection = glGetUniformLocation(program, "uProjection");
+    uModel = glGetUniformLocation(program, "uModel");
 
     glm::mat4 projection = glm::perspective(
         glm::radians(45.0f),
@@ -65,6 +67,12 @@ void initRenderer()
         glm::vec3(0.0f, 0.0f, 0.0f),
         glm::vec3(0.0f, 1.0f, 0.0f));
     glUniformMatrix4fv(uView, 1, GL_FALSE, glm::value_ptr(view));
+
+    glm::mat4 model = glm::mat4(1.0f);
+    model = glm::translate(model, glm::vec3(0.0f, -2.0f, 0.0f));                   // position
+    model = glm::rotate(model, glm::radians(-45.0f), glm::vec3(0.0f, 1.0f, 0.0f)); // rotate 45 degrees around Y axis
+    model = glm::scale(model, glm::vec3(2.0f, 2.0f, 2.0f));                        // double the size
+    glUniformMatrix4fv(uModel, 1, GL_FALSE, glm::value_ptr(model));
 
     mesh.load("models/animal-horse.obj");
 }
