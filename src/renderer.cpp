@@ -7,6 +7,7 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include "mesh.h"
 
 #ifdef __INTELLISENSE__
 #define glBindVertexArray(x)
@@ -16,7 +17,7 @@
 GLuint program;
 GLint uView;
 GLint uProjection;
-GLuint vao;
+Mesh mesh;
 
 std::string loadFile(const std::string &path)
 {
@@ -65,25 +66,12 @@ void initRenderer()
         glm::vec3(0.0f, 1.0f, 0.0f));
     glUniformMatrix4fv(uView, 1, GL_FALSE, glm::value_ptr(view));
 
-    // Triangle geometry
-    float verts[] = {
-        0.0f, 0.5f, 0.0f,   // top
-        -0.5f, -0.5f, 0.0f, // bottom left
-        0.5f, -0.5f, 0.0f   // bottom right
-    };
-    GLuint vbo;
-    glGenVertexArrays(1, &vao);
-    glBindVertexArray(vao);
-    glGenBuffers(1, &vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
-    glEnableVertexAttribArray(0);
+    mesh.load("models/animal-horse.obj");
 }
 
 void draw()
 {
     glClearColor(0.3f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    mesh.draw();
 }

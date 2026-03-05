@@ -4,7 +4,8 @@ project(MyEngine)
 set(CMAKE_CXX_STANDARD 20)
 
 add_executable(index src/main.cpp
-                src/renderer.cpp)
+                src/renderer.cpp
+                src/mesh.cpp)
 
 #external stuff (Vendors?)
 target_include_directories(index PRIVATE vendor)
@@ -16,7 +17,8 @@ if(EMSCRIPTEN)
         -sUSE_WEBGL2=1               # WebGL 2
         -sFULL_ES3=1                 # OpenGL ES 3.0
         -sALLOW_MEMORY_GROWTH=1      # Dynamic memory
-        --shell-file ${CMAKE_SOURCE_DIR}/shell.html  # Custom HTML shell
-        --preload-file ${CMAKE_SOURCE_DIR}/shaders@/shaders
+    "SHELL:--shell-file ${CMAKE_SOURCE_DIR}/shell.html"
+    "SHELL:--preload-file ${CMAKE_SOURCE_DIR}/shaders\@/shaders"
+    "SHELL:--preload-file ${CMAKE_SOURCE_DIR}/models\@/models"
     )
 endif()
