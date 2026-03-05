@@ -52,6 +52,14 @@ build CMakeFiles/index.dir/src/main.cpp.o: CXX_COMPILER__index_unscanned_ C$:/re
   OBJECT_FILE_DIR = CMakeFiles\index.dir\src
   TARGET_SUPPORT_DIR = CMakeFiles\index.dir
 
+build CMakeFiles/index.dir/src/renderer.cpp.o: CXX_COMPILER__index_unscanned_ C$:/repo/Cengine/src/renderer.cpp || cmake_object_order_depends_target_index
+  DEP_FILE = CMakeFiles\index.dir\src\renderer.cpp.o.d
+  FLAGS = -std=gnu++20
+  INCLUDES = -IC:/repo/Cengine/vendor
+  OBJECT_DIR = CMakeFiles\index.dir
+  OBJECT_FILE_DIR = CMakeFiles\index.dir\src
+  TARGET_SUPPORT_DIR = CMakeFiles\index.dir
+
 
 # =============================================================================
 # Link build statements for EXECUTABLE target index
@@ -60,8 +68,8 @@ build CMakeFiles/index.dir/src/main.cpp.o: CXX_COMPILER__index_unscanned_ C$:/re
 #############################################
 # Link the executable index.html
 
-build index.html: CXX_EXECUTABLE_LINKER__index_ CMakeFiles/index.dir/src/main.cpp.o
-  LINK_FLAGS = -sUSE_WEBGL2=1 -sFULL_ES3=1 -sALLOW_MEMORY_GROWTH=1 --shell-file C:/repo/Cengine/shell.html
+build index.html: CXX_EXECUTABLE_LINKER__index_ CMakeFiles/index.dir/src/main.cpp.o CMakeFiles/index.dir/src/renderer.cpp.o
+  LINK_FLAGS = -sUSE_WEBGL2=1 -sFULL_ES3=1 -sALLOW_MEMORY_GROWTH=1 --shell-file C:/repo/Cengine/shell.html --preload-file C:/repo/Cengine/shaders@/shaders
   OBJECT_DIR = CMakeFiles\index.dir
   POST_BUILD = cd .
   PRE_LINK = cd .

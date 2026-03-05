@@ -1,50 +1,13 @@
-#ifdef __INTELLISENSE__
-#define glBindVertexArray(x)
-#define glGenVertexArrays(x, y)
-#endif
-
 #include <GLES3/gl3.h>
 #include <emscripten.h>
 #include <emscripten/html5.h>
 #include <stdio.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-
-const char *vertSrc = R"(#version 300 es
-    layout(location = 0) in vec3 aPos;
-    uniform mat4 uView;
-    uniform mat4 uProjection;
-    void main() {
-        gl_Position = uProjection * uView * vec4(aPos, 1.0);
-    }
-)";
-
-const char *fragSrc = R"(#version 300 es
-    precision mediump float;
-    out vec4 fragColor;
-    void main() {
-        fragColor = vec4(1.0, 0.5, 0.2, 1.0);
-    }
-)";
-
-GLuint vao;
+#include "renderer.h"
 
 glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
 glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
-
-GLuint program;
-GLint uView;
-GLint uProjection;
-
-GLuint compileShader(GLenum type, const char *src)
-{
-    GLuint shader = glCreateShader(type);
-    glShaderSource(shader, 1, &src, nullptr);
-    glCompileShader(shader);
-    return shader;
-}
 
 // Global key state
 bool keys[256] = {};
@@ -77,12 +40,8 @@ void mainLoop()
     // Recalculate view matrix
     glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
     glUniformMatrix4fv(uView, 1, GL_FALSE, glm::value_ptr(view));
-    printf("cameraPos: %f %f %f\n", cameraPos.x, cameraPos.y, cameraPos.z);
 
-    // Draw
-    glClearColor(0.1f, 0.4f, 0.1f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    draw();
 }
 
 int main()
@@ -101,47 +60,7 @@ int main()
     }
     emscripten_webgl_make_context_current(ctx);
 
-    // Shader program
-    GLuint vert = compileShader(GL_VERTEX_SHADER, vertSrc);
-    GLuint frag = compileShader(GL_FRAGMENT_SHADER, fragSrc);
-    program = glCreateProgram();
-    glAttachShader(program, vert);
-    glAttachShader(program, frag);
-    glLinkProgram(program);
-    glUseProgram(program);
-
-    uView = glGetUniformLocation(program, "uView");
-    uProjection = glGetUniformLocation(program, "uProjection");
-
-    glm::mat4 view = glm::lookAt(
-        glm::vec3(0.0f, 0.0f, 3.0f),
-        glm::vec3(0.0f, 0.0f, 0.0f),
-        glm::vec3(0.0f, 1.0f, 0.0f));
-    glUniformMatrix4fv(uView, 1, GL_FALSE, glm::value_ptr(view));
-
-    glm::mat4 projection = glm::perspective(
-        glm::radians(45.0f),
-        800.0f / 600.0f,
-        0.1f,
-        100.0f);
-
-    glUniformMatrix4fv(uView, 1, GL_FALSE, glm::value_ptr(view));
-    glUniformMatrix4fv(uProjection, 1, GL_FALSE, glm::value_ptr(projection));
-
-    // Triangle geometry
-    float verts[] = {
-        0.0f, 0.5f, 0.0f,   // top
-        -0.5f, -0.5f, 0.0f, // bottom left
-        0.5f, -0.5f, 0.0f   // bottom right
-    };
-    GLuint vbo;
-    glGenVertexArrays(1, &vao);
-    glBindVertexArray(vao);
-    glGenBuffers(1, &vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
-    glEnableVertexAttribArray(0);
+    initRenderer();
 
     emscripten_set_keydown_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, nullptr, EM_TRUE, keyDown);
     emscripten_set_keyup_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, nullptr, EM_TRUE, keyUp);
