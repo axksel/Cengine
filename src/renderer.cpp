@@ -8,6 +8,7 @@
 #include <sstream>
 #include <string>
 #include "mesh.h"
+#include <vector>
 
 #ifdef __INTELLISENSE__
 #define glBindVertexArray(x)
@@ -18,7 +19,8 @@ GLuint program;
 GLint uView;
 GLint uProjection;
 GLint uModel;
-Mesh mesh;
+
+std::vector<Mesh> meshes;
 
 std::string loadFile(const std::string &path)
 {
@@ -67,19 +69,15 @@ void initRenderer()
         glm::vec3(0.0f, 0.0f, 0.0f),
         glm::vec3(0.0f, 1.0f, 0.0f));
     glUniformMatrix4fv(uView, 1, GL_FALSE, glm::value_ptr(view));
-
-    glm::mat4 model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3(0.0f, -2.0f, 0.0f));                   // position
-    model = glm::rotate(model, glm::radians(-45.0f), glm::vec3(0.0f, 1.0f, 0.0f)); // rotate 45 degrees around Y axis
-    model = glm::scale(model, glm::vec3(2.0f, 2.0f, 2.0f));                        // double the size
-    glUniformMatrix4fv(uModel, 1, GL_FALSE, glm::value_ptr(model));
-
-    mesh.load("models/animal-horse.obj");
 }
 
 void draw()
 {
     glClearColor(0.3f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
-    mesh.draw();
+    for (Mesh &mesh : meshes)
+    {
+        glUniformMatrix4fv(uModel, 1, GL_FALSE, glm::value_ptr(mesh.transform.getMatrix()));
+        mesh.draw();
+    }
 }

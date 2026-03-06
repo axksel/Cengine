@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <glm/gtc/type_ptr.hpp>
 #include "renderer.h"
+#include "mesh.h"
 
 glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
 glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
@@ -61,6 +62,16 @@ int main()
     emscripten_webgl_make_context_current(ctx);
 
     initRenderer();
+
+    Mesh head;
+    head.load("models/animal-horse.obj");
+    head.transform.position = glm::vec3(1.0f, 0.0f, 0.0f);
+    meshes.push_back(head);
+
+    Mesh head2;
+    head2.load("models/animal-horse.obj");
+    head2.transform.position = glm::vec3(-1.0f, 0.0f, 0.0f);
+    meshes.push_back(head2);
 
     emscripten_set_keydown_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, nullptr, EM_TRUE, keyDown);
     emscripten_set_keyup_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, nullptr, EM_TRUE, keyUp);

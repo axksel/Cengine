@@ -2,6 +2,7 @@
 #include <GLES3/gl3.h>
 #include <vector>
 #include <string>
+#include "transform.h"
 
 struct Mesh
 {
@@ -9,6 +10,7 @@ struct Mesh
     GLuint vbo; // Vertex Buffer Object
     GLuint ebo; // Element Buffer Object
     int indexCount;
+    Transform transform;
 
     void load(const std::string &path);
     void draw();
