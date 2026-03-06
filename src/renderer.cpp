@@ -9,6 +9,8 @@
 #include <string>
 #include "mesh.h"
 #include <vector>
+#include "light.h"
+#include "shadowFramebuffer.h"
 
 #ifdef __INTELLISENSE__
 #define glBindVertexArray(x)
@@ -19,6 +21,15 @@ GLuint program;
 GLint uView;
 GLint uProjection;
 GLint uModel;
+
+GLuint shadowProgram;
+GLint uLightSpaceMatrixShadow;
+GLint uModelShadow;
+Light light;
+
+ShadowFramebuffer shadowFramebuffer;
+GLint uLightSpaceMatrixMain;
+GLint uShadowMap;
 
 std::vector<Mesh> meshes;
 
@@ -71,12 +82,58 @@ void initRenderer()
     glUniformMatrix4fv(uView, 1, GL_FALSE, glm::value_ptr(view));
 
     glEnable(GL_DEPTH_TEST);
+
+    light.update();
+    shadowFramebuffer.init(1024, 1024);
+
+    uShadowMap = glGetUniformLocation(program, "uShadowMap");
+    uLightSpaceMatrixMain = glGetUniformLocation(program, "uLightSpaceMatrix");
+}
+
+void initShadowProgram()
+{
+    std::string vertStr = loadFile("shaders/shadow.vert");
+    std::string fragStr = loadFile("shaders/shadow.frag");
+    const char *vertSrc = vertStr.c_str();
+    const char *fragSrc = fragStr.c_str();
+
+    GLuint vert = compileShader(GL_VERTEX_SHADER, vertSrc);
+    GLuint frag = compileShader(GL_FRAGMENT_SHADER, fragSrc);
+    shadowProgram = glCreateProgram();
+    glAttachShader(shadowProgram, vert);
+    glAttachShader(shadowProgram, frag);
+    glLinkProgram(shadowProgram);
+
+    uLightSpaceMatrixShadow = glGetUniformLocation(shadowProgram, "uLightSpaceMatrix");
+    uModelShadow = glGetUniformLocation(shadowProgram, "uModel");
 }
 
 void draw()
 {
+
+    // --- Pass 1: shadow pass ---
+    shadowFramebuffer.bind();
+    glClear(GL_DEPTH_BUFFER_BIT);
+    glUseProgram(shadowProgram);
+    glUniformMatrix4fv(uLightSpaceMatrixShadow, 1, GL_FALSE, glm::value_ptr(light.lightSpaceMatrix));
+
+    for (Mesh &mesh : meshes)
+    {
+        glUniformMatrix4fv(uModelShadow, 1, GL_FALSE, glm::value_ptr(mesh.transform.getMatrix()));
+        mesh.draw();
+    }
+    shadowFramebuffer.unbind();
+
+    // --- Pass 2: main pass ---
     glClearColor(0.3f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glUseProgram(program);
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, shadowFramebuffer.depthTexture);
+    glUniform1i(uShadowMap, 0); // shadow map is texture unit 0
+    glUniformMatrix4fv(uLightSpaceMatrixMain, 1, GL_FALSE, glm::value_ptr(light.lightSpaceMatrix));
+
     for (Mesh &mesh : meshes)
     {
         glUniformMatrix4fv(uModel, 1, GL_FALSE, glm::value_ptr(mesh.transform.getMatrix()));

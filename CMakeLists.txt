@@ -5,7 +5,8 @@ set(CMAKE_CXX_STANDARD 20)
 
 add_executable(index src/main.cpp
                 src/renderer.cpp
-                src/mesh.cpp)
+                src/mesh.cpp
+                src/shadowFramebuffer.cpp)
 
 #external stuff (Vendors?)
 target_include_directories(index PRIVATE vendor)

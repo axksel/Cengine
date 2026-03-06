@@ -97,6 +97,12 @@ int main()
     emscripten_webgl_make_context_current(ctx);
 
     initRenderer();
+    initShadowProgram();
+
+    Mesh plane;
+    plane.load("models/plane.obj");
+    plane.transform.position = glm::vec3(0.0f, -1.0f, 0.0f);
+    meshes.push_back(plane);
 
     Mesh head;
     head.load("models/animal-horse.obj");

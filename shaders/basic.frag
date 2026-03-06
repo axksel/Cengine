@@ -4,7 +4,11 @@ precision mediump float;
 in vec3 fragNormal;
 in vec3 fragPos;
 
+uniform sampler2D uShadowMap;
+uniform mat4 uLightSpaceMatrix;
+
 out vec4 fragColor;
+
 
 float hash(vec3 p) {
     p = fract(p * vec3(443.897, 441.423, 437.195));
@@ -43,23 +47,44 @@ float fbm(vec3 p) {
     return value;
 }
 
-void main() {
-    vec3 lightColor  = vec3(1.0, 1.0, 1.0);
-    vec3 lightPos = vec3(2.0,5.0,2.0);
 
-    // ambient
-    float ambientStrength = 0.1;
+
+float shadow(vec3 fragPos) {
+    // transform fragment position into light space
+    vec4 fragPosLightSpace = uLightSpaceMatrix * vec4(fragPos, 1.0);
+    
+    // perspective divide
+    vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
+    
+    // transform to 0-1 range
+    projCoords = projCoords * 0.5 + 0.5;
+    
+    // sample shadow map
+    float closestDepth = texture(uShadowMap, projCoords.xy).r;
+    float currentDepth = projCoords.z;
+    
+    // check if in shadow
+    float shadow = currentDepth > closestDepth + 0.005 ? 1.0 : 0.0;
+    return shadow;
+}
+
+void main() {
+    vec3 lightPos    = vec3(2.0, 5.0, 2.0);
+    vec3 lightColor  = vec3(1.0, 1.0, 1.0);
+
+    float ambientStrength = 0.3;
     vec3 ambient = ambientStrength * lightColor;
 
-    // diffuse
     vec3 norm     = normalize(fragNormal);
     vec3 lightDir = normalize(lightPos - fragPos);
     float diff    = max(dot(norm, lightDir), 0.0);
     vec3 diffuse  = diff * lightColor;
 
-    // final color
-    float n = fbm(fragPos * 20.0);
+    float shadowValue = shadow(fragPos);
+    
+    float n = fbm(fragPos * 5.0);
     vec3 objectColor = vec3(n, n * 0.5, 0.2);
-    vec3 result = (ambient + diffuse) * objectColor;
+
+    vec3 result = (ambient + (1.0 - shadowValue) * diffuse) * objectColor;
     fragColor = vec4(result, 1.0);
 }
