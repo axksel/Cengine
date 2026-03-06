@@ -69,12 +69,14 @@ void initRenderer()
         glm::vec3(0.0f, 0.0f, 0.0f),
         glm::vec3(0.0f, 1.0f, 0.0f));
     glUniformMatrix4fv(uView, 1, GL_FALSE, glm::value_ptr(view));
+
+    glEnable(GL_DEPTH_TEST);
 }
 
 void draw()
 {
     glClearColor(0.3f, 0.1f, 0.1f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     for (Mesh &mesh : meshes)
     {
         glUniformMatrix4fv(uModel, 1, GL_FALSE, glm::value_ptr(mesh.transform.getMatrix()));
