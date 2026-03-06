@@ -1,7 +1,0 @@
-{
-	"InstallScripts" : 
-	[
-		"C:/repo/Cengine/build/cmake_install.cmake"
-	],
-	"Parallel" : false
-}

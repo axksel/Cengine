@@ -1,3 +1,0 @@
-C:/repo/Cengine/build/CMakeFiles/index.dir
-C:/repo/Cengine/build/CMakeFiles/edit_cache.dir
-C:/repo/Cengine/build/CMakeFiles/rebuild_cache.dir
