@@ -10,6 +10,11 @@ add_executable(index src/main.cpp
 #external stuff (Vendors?)
 target_include_directories(index PRIVATE vendor)
 
+set_property(TARGET index PROPERTY LINK_DEPENDS
+    ${CMAKE_SOURCE_DIR}/shaders/basic.vert
+    ${CMAKE_SOURCE_DIR}/shaders/basic.frag
+)
+
 # Emscripten-specific flags
 if(EMSCRIPTEN)
     set_target_properties(index PROPERTIES SUFFIX ".html")
