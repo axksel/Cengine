@@ -5,6 +5,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include "renderer.h"
 #include "mesh.h"
+#include "instancedMesh.h"
 
 glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
 glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
@@ -75,7 +76,10 @@ void mainLoop()
 
     // Recalculate view matrix
     glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+    glUseProgram(program);
     glUniformMatrix4fv(uView, 1, GL_FALSE, glm::value_ptr(view));
+    glUseProgram(instancedProgram);
+    glUniformMatrix4fv(uViewInstanced, 1, GL_FALSE, glm::value_ptr(view));
 
     draw();
 }
@@ -97,6 +101,8 @@ int main()
     emscripten_webgl_make_context_current(ctx);
 
     initRenderer();
+    initInstancedProgram();
+    initInstancedShadowProgram();
     initShadowProgram();
 
     Mesh plane;
@@ -109,10 +115,20 @@ int main()
     head.transform.position = glm::vec3(1.0f, 0.0f, 0.0f);
     meshes.push_back(head);
 
-    Mesh head2;
-    head2.load("models/sphere.obj");
-    head2.transform.position = glm::vec3(-1.0f, 0.0f, 0.0f);
-    meshes.push_back(head2);
+    InstancedMesh spheres;
+    spheres.load("models/sphere.obj");
+    Transform tInstance;
+    for (int i = 0; i < 10; i++)
+    {
+        float x = ((rand() % 200) - 100) * 0.01f;
+        float y = ((rand() % 200) - 100) * 0.01f;
+        float z = ((rand() % 200) - 100) * 0.01f;
+        tInstance.position = glm::vec3(x, y, z);
+        tInstance.scale = glm::vec3(x * 0.5f);
+        spheres.addInstance(tInstance.getMatrix());
+    }
+    spheres.uploadInstances();
+    instancedMeshes.push_back(spheres);
 
     emscripten_set_keydown_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, nullptr, EM_TRUE, keyDown);
     emscripten_set_keyup_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, nullptr, EM_TRUE, keyUp);

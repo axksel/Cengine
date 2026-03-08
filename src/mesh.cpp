@@ -5,8 +5,6 @@
 #include <string>
 #include <vector>
 #include <stdio.h>
-#include <algorithm>
-#include <map>
 
 #ifdef __INTELLISENSE__
 #define glBindVertexArray(x)
@@ -36,6 +34,8 @@ void Mesh::load(const std::string &path)
     glGenBuffers(1, &ebo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, data.indices.size() * sizeof(unsigned int), data.indices.data(), GL_STATIC_DRAW);
+
+    glBindVertexArray(0);
 
     printf("Loaded %s: %zu vertices, %zu indices\n", path.c_str(), data.vertices.size() / 6, data.indices.size());
 }

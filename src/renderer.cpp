@@ -11,6 +11,7 @@
 #include <vector>
 #include "light.h"
 #include "shadowFramebuffer.h"
+#include "instancedMesh.h"
 
 #ifdef __INTELLISENSE__
 #define glBindVertexArray(x)
@@ -21,6 +22,17 @@ GLuint program;
 GLint uView;
 GLint uProjection;
 GLint uModel;
+
+GLuint instancedProgram;
+GLint uViewInstanced;
+GLint uProjectionInstanced;
+GLint uShadowMapInstanced;
+GLint uLightSpaceMatrixInstanced;
+GLint uLightPosInstanced;
+GLint uLightColorInstanced;
+
+GLuint instancedShadowProgram;
+GLint uLightSpaceMatrixInstancedShadow;
 
 GLuint shadowProgram;
 GLint uLightSpaceMatrixShadow;
@@ -34,6 +46,7 @@ GLint uLightSpaceMatrixMain;
 GLint uShadowMap;
 
 std::vector<Mesh> meshes;
+std::vector<InstancedMesh> instancedMeshes;
 
 std::string loadFile(const std::string &path)
 {
@@ -94,6 +107,59 @@ void initRenderer()
     uLightColor = glGetUniformLocation(program, "uLightColor");
 }
 
+void initInstancedProgram()
+{
+    std::string vertStr = loadFile("shaders/instanced.vert");
+    std::string fragStr = loadFile("shaders/basic.frag"); // reuse existing frag shader
+    const char *vertSrc = vertStr.c_str();
+    const char *fragSrc = fragStr.c_str();
+
+    GLuint vert = compileShader(GL_VERTEX_SHADER, vertSrc);
+    GLuint frag = compileShader(GL_FRAGMENT_SHADER, fragSrc);
+    instancedProgram = glCreateProgram();
+    glAttachShader(instancedProgram, vert);
+    glAttachShader(instancedProgram, frag);
+    glLinkProgram(instancedProgram);
+    glUseProgram(instancedProgram);
+
+    uShadowMapInstanced = glGetUniformLocation(instancedProgram, "uShadowMap");
+    uLightSpaceMatrixInstanced = glGetUniformLocation(instancedProgram, "uLightSpaceMatrix");
+    uLightPosInstanced = glGetUniformLocation(instancedProgram, "uLightPos");
+    uLightColorInstanced = glGetUniformLocation(instancedProgram, "uLightColor");
+
+    glm::mat4 view = glm::lookAt(
+        glm::vec3(0.0f, 0.0f, 3.0f),
+        glm::vec3(0.0f, 0.0f, 0.0f),
+        glm::vec3(0.0f, 1.0f, 0.0f));
+    uViewInstanced = glGetUniformLocation(instancedProgram, "uView");
+    glUniformMatrix4fv(uViewInstanced, 1, GL_FALSE, glm::value_ptr(view));
+
+    glm::mat4 projection = glm::perspective(
+        glm::radians(45.0f),
+        800.0f / 600.0f,
+        0.1f,
+        100.0f);
+    uProjectionInstanced = glGetUniformLocation(instancedProgram, "uProjection");
+    glUniformMatrix4fv(uProjectionInstanced, 1, GL_FALSE, glm::value_ptr(projection));
+}
+
+void initInstancedShadowProgram()
+{
+    std::string vertStr = loadFile("shaders/instanced_shadow.vert");
+    std::string fragStr = loadFile("shaders/shadow.frag"); // reuse shadow frag
+    const char *vertSrc = vertStr.c_str();
+    const char *fragSrc = fragStr.c_str();
+
+    GLuint vert = compileShader(GL_VERTEX_SHADER, vertSrc);
+    GLuint frag = compileShader(GL_FRAGMENT_SHADER, fragSrc);
+    instancedShadowProgram = glCreateProgram();
+    glAttachShader(instancedShadowProgram, vert);
+    glAttachShader(instancedShadowProgram, frag);
+    glLinkProgram(instancedShadowProgram);
+
+    uLightSpaceMatrixInstancedShadow = glGetUniformLocation(instancedShadowProgram, "uLightSpaceMatrix");
+}
+
 void initShadowProgram()
 {
     std::string vertStr = loadFile("shaders/shadow.vert");
@@ -126,6 +192,12 @@ void draw()
         glUniformMatrix4fv(uModelShadow, 1, GL_FALSE, glm::value_ptr(mesh.transform.getMatrix()));
         mesh.draw();
     }
+    glUseProgram(instancedShadowProgram);
+    glUniformMatrix4fv(uLightSpaceMatrixInstancedShadow, 1, GL_FALSE, glm::value_ptr(light.lightSpaceMatrix));
+    for (InstancedMesh &mesh : instancedMeshes)
+    {
+        mesh.draw();
+    }
     shadowFramebuffer.unbind();
 
     // --- Pass 2: main pass ---
@@ -143,6 +215,20 @@ void draw()
     for (Mesh &mesh : meshes)
     {
         glUniformMatrix4fv(uModel, 1, GL_FALSE, glm::value_ptr(mesh.transform.getMatrix()));
+        mesh.draw();
+    }
+
+    // -  - - Instanced pass ---
+    glUseProgram(instancedProgram);
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, shadowFramebuffer.depthTexture);
+    glUniform1i(uShadowMapInstanced, 0); // shadow map is texture unit 0
+    glUniformMatrix4fv(uLightSpaceMatrixInstanced, 1, GL_FALSE, glm::value_ptr(light.lightSpaceMatrix));
+    glUniform3fv(uLightPosInstanced, 1, glm::value_ptr(light.position));
+    glUniform3fv(uLightColorInstanced, 1, glm::value_ptr(light.color));
+    for (InstancedMesh &mesh : instancedMeshes)
+    {
         mesh.draw();
     }
 }

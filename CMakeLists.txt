@@ -7,7 +7,8 @@ add_executable(index src/main.cpp
                 src/renderer.cpp
                 src/mesh.cpp
                 src/shadowFramebuffer.cpp
-                src/meshImporter.cpp)
+                src/meshImporter.cpp
+                src/instancedMesh.cpp)
 
 #external stuff (Vendors?)
 target_include_directories(index PRIVATE vendor)
@@ -15,6 +16,8 @@ target_include_directories(index PRIVATE vendor)
 set_property(TARGET index PROPERTY LINK_DEPENDS
     ${CMAKE_SOURCE_DIR}/shaders/basic.vert
     ${CMAKE_SOURCE_DIR}/shaders/basic.frag
+    ${CMAKE_SOURCE_DIR}/shaders/instanced.vert
+    ${CMAKE_SOURCE_DIR}/shaders/instanced_shadow.vert
 )
 
 # Emscripten-specific flags
