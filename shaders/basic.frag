@@ -60,6 +60,7 @@ float shadow(vec3 fragPos) {
     
     // transform to 0-1 range
     projCoords = projCoords * 0.5 + 0.5;
+    if (projCoords.z > 1.0) return 0.0; // check if its outside the light's range
     
     // sample shadow map
     float closestDepth = texture(uShadowMap, projCoords.xy).r;
