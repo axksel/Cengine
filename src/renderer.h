@@ -7,9 +7,7 @@
 
 extern ShadowFramebuffer shadowFramebuffer;
 
-extern GLint uView;
-extern GLint uModel;
-extern Light light;
+extern GLint uView; // extern camera gets updated from main.cpp atm
 
 extern std::vector<Mesh> meshes;
 

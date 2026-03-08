@@ -6,6 +6,8 @@ in vec3 fragPos;
 
 uniform sampler2D uShadowMap;
 uniform mat4 uLightSpaceMatrix;
+uniform vec3 uLightPos;
+uniform vec3 uLightColor;
 
 out vec4 fragColor;
 
@@ -69,16 +71,14 @@ float shadow(vec3 fragPos) {
 }
 
 void main() {
-    vec3 lightPos    = vec3(2.0, 5.0, 2.0);
-    vec3 lightColor  = vec3(1.0, 1.0, 1.0);
 
     float ambientStrength = 0.3;
-    vec3 ambient = ambientStrength * lightColor;
+    vec3 ambient = ambientStrength * uLightColor;
 
     vec3 norm     = normalize(fragNormal);
-    vec3 lightDir = normalize(lightPos - fragPos);
+    vec3 lightDir = normalize(uLightPos - fragPos);
     float diff    = max(dot(norm, lightDir), 0.0);
-    vec3 diffuse  = diff * lightColor;
+    vec3 diffuse  = diff * uLightColor;
 
     float shadowValue = shadow(fragPos);
     

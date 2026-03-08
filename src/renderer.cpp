@@ -26,6 +26,8 @@ GLuint shadowProgram;
 GLint uLightSpaceMatrixShadow;
 GLint uModelShadow;
 Light light;
+GLint uLightPos;
+GLint uLightColor;
 
 ShadowFramebuffer shadowFramebuffer;
 GLint uLightSpaceMatrixMain;
@@ -88,6 +90,8 @@ void initRenderer()
 
     uShadowMap = glGetUniformLocation(program, "uShadowMap");
     uLightSpaceMatrixMain = glGetUniformLocation(program, "uLightSpaceMatrix");
+    uLightPos = glGetUniformLocation(program, "uLightPos");
+    uLightColor = glGetUniformLocation(program, "uLightColor");
 }
 
 void initShadowProgram()
@@ -133,6 +137,8 @@ void draw()
     glBindTexture(GL_TEXTURE_2D, shadowFramebuffer.depthTexture);
     glUniform1i(uShadowMap, 0); // shadow map is texture unit 0
     glUniformMatrix4fv(uLightSpaceMatrixMain, 1, GL_FALSE, glm::value_ptr(light.lightSpaceMatrix));
+    glUniform3fv(uLightPos, 1, glm::value_ptr(light.position));
+    glUniform3fv(uLightColor, 1, glm::value_ptr(light.color));
 
     for (Mesh &mesh : meshes)
     {
