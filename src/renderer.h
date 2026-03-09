@@ -23,4 +23,5 @@ void initShadowProgram();
 void initInstancedShadowProgram();
 void initInstancedProgram();
 void initFXAAProgram();
+void initSkyboxProgram();
 void draw();

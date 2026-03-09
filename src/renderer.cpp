@@ -14,6 +14,7 @@
 #include "colorFramebuffer.h"
 #include "instancedMesh.h"
 #include "fullscreenQuad.h"
+#include "skybox.h"
 
 #ifdef __INTELLISENSE__
 #define glBindVertexArray(x)
@@ -49,6 +50,9 @@ GLuint fxaaProgram;
 GLint uColorTexture;
 FullScreenQuad quad;
 GLint uTexelSize;
+
+GLuint skyboxProgram;
+Skybox skybox;
 
 std::vector<Mesh> meshes;
 std::vector<InstancedMesh> instancedMeshes;
@@ -181,6 +185,29 @@ void initInstancedShadowProgram()
     uLightSpaceMatrixInstancedShadow = glGetUniformLocation(instancedShadowProgram, "uLightSpaceMatrix");
 }
 
+void initSkyboxProgram()
+{
+    std::string vertStr = loadFile("shaders/skybox.vert");
+    std::string fragStr = loadFile("shaders/skybox.frag");
+    const char *vertSrc = vertStr.c_str();
+    const char *fragSrc = fragStr.c_str();
+
+    GLuint vert = compileShader(GL_VERTEX_SHADER, vertSrc);
+    GLuint frag = compileShader(GL_FRAGMENT_SHADER, fragSrc);
+    skyboxProgram = glCreateProgram();
+    glAttachShader(skyboxProgram, vert);
+    glAttachShader(skyboxProgram, frag);
+    glLinkProgram(skyboxProgram);
+
+    GLuint camIndex = glGetUniformBlockIndex(skyboxProgram, "Camera");
+    glUniformBlockBinding(skyboxProgram, camIndex, 0);
+
+    GLuint lightIndex = glGetUniformBlockIndex(skyboxProgram, "Light");
+    glUniformBlockBinding(skyboxProgram, lightIndex, 1);
+
+    skybox.init();
+}
+
 void initShadowProgram()
 {
     std::string vertStr = loadFile("shaders/shadow.vert");
@@ -240,12 +267,17 @@ void draw()
     }
     shadowFramebuffer.unbind();
 
-    // --- Pass 2: main pass ---
+    // --- Pass 2: skybox pass ---
     colorFramebuffer.bind();
     glClearColor(0.3f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glUseProgram(program);
+    glDepthMask(GL_FALSE); // disable depth writing
+    glUseProgram(skyboxProgram);
+    skybox.draw();
+    glDepthMask(GL_TRUE); // re-enable
 
+    // --- Pass 2: main pass ---
+    glUseProgram(program);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, shadowFramebuffer.depthTexture);
     glUniform1i(uShadowMap, 0); // shadow map is texture unit 0
