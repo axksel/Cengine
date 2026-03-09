@@ -35,10 +35,8 @@ GLuint instancedProgram;
 GLint uShadowMapInstanced;
 
 GLuint instancedShadowProgram;
-GLint uLightSpaceMatrixInstancedShadow;
 
 GLuint shadowProgram;
-GLint uLightSpaceMatrixShadow;
 GLint uModelShadow;
 Light light;
 
@@ -164,7 +162,9 @@ void initInstancedProgram()
 void initInstancedShadowProgram()
 {
     InitProgram(instancedShadowProgram, "shaders/instanced_shadow.vert", "shaders/shadow.frag");
-    uLightSpaceMatrixInstancedShadow = glGetUniformLocation(instancedShadowProgram, "uLightSpaceMatrix");
+    GLint uLightSpaceMatrixInstancedShadow = glGetUniformLocation(instancedShadowProgram, "uLightSpaceMatrix");
+    glUseProgram(instancedShadowProgram);
+    glUniformMatrix4fv(uLightSpaceMatrixInstancedShadow, 1, GL_FALSE, glm::value_ptr(light.lightSpaceMatrix));
 }
 
 void initSkyboxProgram()
@@ -184,7 +184,9 @@ void initShadowProgram()
 {
     InitProgram(shadowProgram, "shaders/shadow.vert", "shaders/shadow.frag");
 
-    uLightSpaceMatrixShadow = glGetUniformLocation(shadowProgram, "uLightSpaceMatrix");
+    GLint uLightSpaceMatrixShadow = glGetUniformLocation(shadowProgram, "uLightSpaceMatrix");
+    glUseProgram(shadowProgram);
+    glUniformMatrix4fv(uLightSpaceMatrixShadow, 1, GL_FALSE, glm::value_ptr(light.lightSpaceMatrix));
     uModelShadow = glGetUniformLocation(shadowProgram, "uModel");
 }
 
@@ -204,15 +206,12 @@ void draw()
     shadowFramebuffer.bind();
     glClear(GL_DEPTH_BUFFER_BIT);
     glUseProgram(shadowProgram);
-    glUniformMatrix4fv(uLightSpaceMatrixShadow, 1, GL_FALSE, glm::value_ptr(light.lightSpaceMatrix));
-
     for (Mesh &mesh : meshes)
     {
         glUniformMatrix4fv(uModelShadow, 1, GL_FALSE, glm::value_ptr(mesh.transform.getMatrix()));
         mesh.draw();
     }
     glUseProgram(instancedShadowProgram);
-    glUniformMatrix4fv(uLightSpaceMatrixInstancedShadow, 1, GL_FALSE, glm::value_ptr(light.lightSpaceMatrix));
     for (InstancedMesh &mesh : instancedMeshes)
     {
         mesh.draw();
