@@ -16,20 +16,20 @@
 #ifdef __INTELLISENSE__
 #define glBindVertexArray(x)
 #define glGenVertexArrays(x, y)
+#define GL_UNIFORM_BUFFER 0
+#define glBindBufferBase(x, y, z)
+#define glUniformBlockBinding(x, y, z)
+#define glGetUniformBlockIndex(x, y) 0
 #endif
 
+GLuint cameraUBO;
+GLuint lightUBO;
+
 GLuint program;
-GLint uView;
-GLint uProjection;
 GLint uModel;
 
 GLuint instancedProgram;
-GLint uViewInstanced;
-GLint uProjectionInstanced;
 GLint uShadowMapInstanced;
-GLint uLightSpaceMatrixInstanced;
-GLint uLightPosInstanced;
-GLint uLightColorInstanced;
 
 GLuint instancedShadowProgram;
 GLint uLightSpaceMatrixInstancedShadow;
@@ -38,11 +38,8 @@ GLuint shadowProgram;
 GLint uLightSpaceMatrixShadow;
 GLint uModelShadow;
 Light light;
-GLint uLightPos;
-GLint uLightColor;
 
 ShadowFramebuffer shadowFramebuffer;
-GLint uLightSpaceMatrixMain;
 GLint uShadowMap;
 
 std::vector<Mesh> meshes;
@@ -79,32 +76,49 @@ void initRenderer()
     glLinkProgram(program);
     glUseProgram(program);
 
-    uView = glGetUniformLocation(program, "uView");
-    uProjection = glGetUniformLocation(program, "uProjection");
     uModel = glGetUniformLocation(program, "uModel");
+
+    // Camera UBO setup
+    glGenBuffers(1, &cameraUBO);
+    glBindBuffer(GL_UNIFORM_BUFFER, cameraUBO);
+    glBufferData(GL_UNIFORM_BUFFER, 2 * sizeof(glm::mat4), nullptr, GL_STATIC_DRAW);
+    glBindBufferBase(GL_UNIFORM_BUFFER, 0, cameraUBO); // bind to point 0
 
     glm::mat4 projection = glm::perspective(
         glm::radians(45.0f),
         800.0f / 600.0f,
         0.1f,
         100.0f);
-    glUniformMatrix4fv(uProjection, 1, GL_FALSE, glm::value_ptr(projection));
 
     glm::mat4 view = glm::lookAt(
         glm::vec3(0.0f, 0.0f, 3.0f),
         glm::vec3(0.0f, 0.0f, 0.0f),
         glm::vec3(0.0f, 1.0f, 0.0f));
-    glUniformMatrix4fv(uView, 1, GL_FALSE, glm::value_ptr(view));
 
-    glEnable(GL_DEPTH_TEST);
+    glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(view));                       // offset 0
+    glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(projection)); // offset 64
 
+    GLuint camIndex = glGetUniformBlockIndex(program, "Camera");
+    glUniformBlockBinding(program, camIndex, 0);
+
+    // Light and shadow setup and UBO
     light.update();
     shadowFramebuffer.init(1024, 1024);
-
     uShadowMap = glGetUniformLocation(program, "uShadowMap");
-    uLightSpaceMatrixMain = glGetUniformLocation(program, "uLightSpaceMatrix");
-    uLightPos = glGetUniformLocation(program, "uLightPos");
-    uLightColor = glGetUniformLocation(program, "uLightColor");
+
+    glGenBuffers(1, &lightUBO);
+    glBindBuffer(GL_UNIFORM_BUFFER, lightUBO);
+    glBufferData(GL_UNIFORM_BUFFER, sizeof(glm::mat4) + 2 * sizeof(glm::vec4), nullptr, GL_DYNAMIC_DRAW);
+    glBindBufferBase(GL_UNIFORM_BUFFER, 1, lightUBO); // binding point 1
+
+    glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(light.lightSpaceMatrix));
+    glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::vec4), glm::value_ptr(light.position));
+    glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4) + sizeof(glm::vec4), sizeof(glm::vec4), glm::value_ptr(light.color));
+
+    GLuint lightIndex = glGetUniformBlockIndex(program, "Light");
+    glUniformBlockBinding(program, lightIndex, 1);
+
+    glEnable(GL_DEPTH_TEST);
 }
 
 void initInstancedProgram()
@@ -123,24 +137,11 @@ void initInstancedProgram()
     glUseProgram(instancedProgram);
 
     uShadowMapInstanced = glGetUniformLocation(instancedProgram, "uShadowMap");
-    uLightSpaceMatrixInstanced = glGetUniformLocation(instancedProgram, "uLightSpaceMatrix");
-    uLightPosInstanced = glGetUniformLocation(instancedProgram, "uLightPos");
-    uLightColorInstanced = glGetUniformLocation(instancedProgram, "uLightColor");
+    GLuint lightIndex = glGetUniformBlockIndex(instancedProgram, "Light");
+    glUniformBlockBinding(instancedProgram, lightIndex, 1);
 
-    glm::mat4 view = glm::lookAt(
-        glm::vec3(0.0f, 0.0f, 3.0f),
-        glm::vec3(0.0f, 0.0f, 0.0f),
-        glm::vec3(0.0f, 1.0f, 0.0f));
-    uViewInstanced = glGetUniformLocation(instancedProgram, "uView");
-    glUniformMatrix4fv(uViewInstanced, 1, GL_FALSE, glm::value_ptr(view));
-
-    glm::mat4 projection = glm::perspective(
-        glm::radians(45.0f),
-        800.0f / 600.0f,
-        0.1f,
-        100.0f);
-    uProjectionInstanced = glGetUniformLocation(instancedProgram, "uProjection");
-    glUniformMatrix4fv(uProjectionInstanced, 1, GL_FALSE, glm::value_ptr(projection));
+    GLuint camIndex = glGetUniformBlockIndex(instancedProgram, "Camera");
+    glUniformBlockBinding(instancedProgram, camIndex, 0);
 }
 
 void initInstancedShadowProgram()
@@ -208,10 +209,6 @@ void draw()
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, shadowFramebuffer.depthTexture);
     glUniform1i(uShadowMap, 0); // shadow map is texture unit 0
-    glUniformMatrix4fv(uLightSpaceMatrixMain, 1, GL_FALSE, glm::value_ptr(light.lightSpaceMatrix));
-    glUniform3fv(uLightPos, 1, glm::value_ptr(light.position));
-    glUniform3fv(uLightColor, 1, glm::value_ptr(light.color));
-
     for (Mesh &mesh : meshes)
     {
         glUniformMatrix4fv(uModel, 1, GL_FALSE, glm::value_ptr(mesh.transform.getMatrix()));
@@ -224,9 +221,6 @@ void draw()
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, shadowFramebuffer.depthTexture);
     glUniform1i(uShadowMapInstanced, 0); // shadow map is texture unit 0
-    glUniformMatrix4fv(uLightSpaceMatrixInstanced, 1, GL_FALSE, glm::value_ptr(light.lightSpaceMatrix));
-    glUniform3fv(uLightPosInstanced, 1, glm::value_ptr(light.position));
-    glUniform3fv(uLightColorInstanced, 1, glm::value_ptr(light.color));
     for (InstancedMesh &mesh : instancedMeshes)
     {
         mesh.draw();

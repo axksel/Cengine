@@ -1,8 +1,12 @@
 #version 300 es
     layout(location = 0) in vec3 aPos;
     layout(location = 1) in vec3 aNormal;
-    uniform mat4 uView;
-    uniform mat4 uProjection;
+
+layout(std140) uniform Camera {
+    mat4 uView;
+    mat4 uProjection;
+};
+
     uniform mat4 uModel;
 
     out vec3 fragNormal;

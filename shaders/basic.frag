@@ -5,9 +5,12 @@ in vec3 fragNormal;
 in vec3 fragPos;
 
 uniform sampler2D uShadowMap;
-uniform mat4 uLightSpaceMatrix;
-uniform vec3 uLightPos;
-uniform vec3 uLightColor;
+
+layout(std140) uniform Light {
+    mat4 uLightSpaceMatrix;
+    vec3 uLightPos;
+    vec3 uLightColor;
+};
 
 out vec4 fragColor;
 

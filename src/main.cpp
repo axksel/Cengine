@@ -7,6 +7,10 @@
 #include "mesh.h"
 #include "instancedMesh.h"
 
+#ifdef __INTELLISENSE__
+#define GL_UNIFORM_BUFFER 0
+#endif
+
 glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
 glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
@@ -76,10 +80,8 @@ void mainLoop()
 
     // Recalculate view matrix
     glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
-    glUseProgram(program);
-    glUniformMatrix4fv(uView, 1, GL_FALSE, glm::value_ptr(view));
-    glUseProgram(instancedProgram);
-    glUniformMatrix4fv(uViewInstanced, 1, GL_FALSE, glm::value_ptr(view));
+    glBindBuffer(GL_UNIFORM_BUFFER, cameraUBO);
+    glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(view));
 
     draw();
 }
