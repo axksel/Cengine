@@ -11,6 +11,7 @@ struct Mesh
     GLuint ebo; // Element Buffer Object
     int indexCount;
     Transform transform;
+    glm::vec3 color = glm::vec3(1.0f);
 
     void load(const std::string &path);
     void draw();

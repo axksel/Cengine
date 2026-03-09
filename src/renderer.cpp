@@ -30,9 +30,11 @@ GLuint lightUBO;
 
 GLuint program;
 GLint uModel;
+GLint uColor;
 
 GLuint instancedProgram;
 GLint uShadowMapInstanced;
+GLint uColorInstanced;
 
 GLuint instancedShadowProgram;
 
@@ -100,6 +102,7 @@ void initRenderer()
     InitProgram(program, "shaders/basic.vert", "shaders/basic.frag");
 
     uModel = glGetUniformLocation(program, "uModel");
+    uColor = glGetUniformLocation(program, "uColor");
 
     // Camera UBO setup
     glGenBuffers(1, &cameraUBO);
@@ -152,6 +155,7 @@ void initInstancedProgram()
     InitProgram(instancedProgram, "shaders/instanced.vert", "shaders/basic.frag");
 
     uShadowMapInstanced = glGetUniformLocation(instancedProgram, "uShadowMap");
+    uColorInstanced = glGetUniformLocation(instancedProgram, "uColor");
     GLuint lightIndex = glGetUniformBlockIndex(instancedProgram, "Light");
     glUniformBlockBinding(instancedProgram, lightIndex, 1);
 
@@ -235,6 +239,7 @@ void draw()
     for (Mesh &mesh : meshes)
     {
         glUniformMatrix4fv(uModel, 1, GL_FALSE, glm::value_ptr(mesh.transform.getMatrix()));
+        glUniform3fv(uColor, 1, glm::value_ptr(mesh.color));
         mesh.draw();
     }
 
@@ -244,9 +249,10 @@ void draw()
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, shadowFramebuffer.depthTexture);
     glUniform1i(uShadowMapInstanced, 0); // shadow map is texture unit 0
-    for (InstancedMesh &mesh : instancedMeshes)
+    for (InstancedMesh &meshInstanced : instancedMeshes)
     {
-        mesh.draw();
+        glUniform3fv(uColorInstanced, 1, glm::value_ptr(meshInstanced.mesh.color));
+        meshInstanced.draw();
     }
     colorFramebuffer.unbind();
 

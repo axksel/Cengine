@@ -112,11 +112,13 @@ int main()
     Mesh plane;
     plane.load("models/plane.obj");
     plane.transform.position = glm::vec3(0.0f, -1.0f, 0.0f);
+    plane.color = glm::vec3(0.5f, 0.5f, 0.5f); // Gray colorw
     meshes.push_back(plane);
 
     Mesh head;
     head.load("models/animal-horse.obj");
     head.transform.position = glm::vec3(1.0f, 0.0f, 0.0f);
+    head.color = glm::vec3(1.0f, 0.2f, 0.3f); // Red color
     meshes.push_back(head);
 
     InstancedMesh spheres;
@@ -131,6 +133,7 @@ int main()
         tInstance.scale = glm::vec3(x * 0.5f);
         spheres.addInstance(tInstance.getMatrix());
     }
+    spheres.mesh.color = glm::vec3(0.2f, 0.5f, 1.0f);
     spheres.uploadInstances();
     instancedMeshes.push_back(spheres);
 
