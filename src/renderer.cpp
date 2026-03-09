@@ -129,7 +129,7 @@ void initRenderer()
 
     // Light and shadow setup and UBO
     light.update();
-    shadowFramebuffer.init(1024, 1024);
+    shadowFramebuffer.init(2048, 2048);
     uShadowMap = glGetUniformLocation(program, "uShadowMap");
 
     // fxaa

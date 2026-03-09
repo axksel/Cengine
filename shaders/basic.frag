@@ -16,22 +16,21 @@ layout(std140) uniform Light {
 out vec4 fragColor;
 
 float shadow(vec3 fragPos) {
-    // transform fragment position into light space
     vec4 fragPosLightSpace = uLightSpaceMatrix * vec4(fragPos, 1.0);
-    
-    // perspective divide
     vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
-    
-    // transform to 0-1 range
     projCoords = projCoords * 0.5 + 0.5;
-    if (projCoords.z > 1.0) return 0.0; // check if its outside the light's range
-    
-    // sample shadow map
-    float closestDepth = texture(uShadowMap, projCoords.xy).r;
+
+    if (projCoords.z > 1.0) return 0.0;
+
     float currentDepth = projCoords.z;
-    
-    // check if in shadow
-    float shadow = currentDepth > closestDepth + 0.005 ? 1.0 : 0.0;
+    float shadow = 0.0;
+    vec2 texelSize = 1.0 / vec2(textureSize(uShadowMap, 0));
+
+    for (int x = -1; x <= 1; x++)
+        for (int y = -1; y <= 1; y++)
+            shadow += currentDepth > texture(uShadowMap, projCoords.xy + vec2(x, y) * texelSize).r + 0.005 ? 1.0 : 0.0;
+
+    shadow /= 9.0;
     return shadow;
 }
 
