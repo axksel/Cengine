@@ -8,7 +8,9 @@ add_executable(index src/main.cpp
                 src/mesh.cpp
                 src/shadowFramebuffer.cpp
                 src/meshImporter.cpp
-                src/instancedMesh.cpp)
+                src/instancedMesh.cpp
+                src/colorFramebuffer.cpp
+                src/fullscreenQuad.cpp)
 
 #external stuff (Vendors?)
 target_include_directories(index PRIVATE vendor)

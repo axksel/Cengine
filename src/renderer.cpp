@@ -11,7 +11,9 @@
 #include <vector>
 #include "light.h"
 #include "shadowFramebuffer.h"
+#include "colorFramebuffer.h"
 #include "instancedMesh.h"
+#include "fullscreenQuad.h"
 
 #ifdef __INTELLISENSE__
 #define glBindVertexArray(x)
@@ -42,6 +44,12 @@ Light light;
 ShadowFramebuffer shadowFramebuffer;
 GLint uShadowMap;
 
+ColorFramebuffer colorFramebuffer;
+GLuint fxaaProgram;
+GLint uColorTexture;
+FullScreenQuad quad;
+GLint uTexelSize;
+
 std::vector<Mesh> meshes;
 std::vector<InstancedMesh> instancedMeshes;
 
@@ -58,6 +66,15 @@ GLuint compileShader(GLenum type, const char *src)
     GLuint shader = glCreateShader(type);
     glShaderSource(shader, 1, &src, nullptr);
     glCompileShader(shader);
+    // check for errors
+    GLint success;
+    glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
+    if (!success)
+    {
+        char log[512];
+        glGetShaderInfoLog(shader, 512, nullptr, log);
+        printf("Shader compile error: %s\n", log);
+    }
     return shader;
 }
 
@@ -81,7 +98,7 @@ void initRenderer()
     // Camera UBO setup
     glGenBuffers(1, &cameraUBO);
     glBindBuffer(GL_UNIFORM_BUFFER, cameraUBO);
-    glBufferData(GL_UNIFORM_BUFFER, 2 * sizeof(glm::mat4), nullptr, GL_STATIC_DRAW);
+    glBufferData(GL_UNIFORM_BUFFER, 2 * sizeof(glm::mat4), nullptr, GL_DYNAMIC_DRAW);
     glBindBufferBase(GL_UNIFORM_BUFFER, 0, cameraUBO); // bind to point 0
 
     glm::mat4 projection = glm::perspective(
@@ -105,6 +122,9 @@ void initRenderer()
     light.update();
     shadowFramebuffer.init(1024, 1024);
     uShadowMap = glGetUniformLocation(program, "uShadowMap");
+
+    // fxaa
+    colorFramebuffer.init(1024, 1024);
 
     glGenBuffers(1, &lightUBO);
     glBindBuffer(GL_UNIFORM_BUFFER, lightUBO);
@@ -179,6 +199,25 @@ void initShadowProgram()
     uModelShadow = glGetUniformLocation(shadowProgram, "uModel");
 }
 
+void initFXAAProgram()
+{
+    std::string vertStr = loadFile("shaders/fxaa.vert");
+    std::string fragStr = loadFile("shaders/fxaa.frag");
+    const char *vertSrc = vertStr.c_str();
+    const char *fragSrc = fragStr.c_str();
+
+    GLuint vert = compileShader(GL_VERTEX_SHADER, vertSrc);
+    GLuint frag = compileShader(GL_FRAGMENT_SHADER, fragSrc);
+    fxaaProgram = glCreateProgram();
+    glAttachShader(fxaaProgram, vert);
+    glAttachShader(fxaaProgram, frag);
+    glLinkProgram(fxaaProgram);
+
+    uColorTexture = glGetUniformLocation(fxaaProgram, "uColorTexture");
+    uTexelSize = glGetUniformLocation(fxaaProgram, "uTexelSize");
+    quad.init();
+}
+
 void draw()
 {
 
@@ -202,6 +241,7 @@ void draw()
     shadowFramebuffer.unbind();
 
     // --- Pass 2: main pass ---
+    colorFramebuffer.bind();
     glClearColor(0.3f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glUseProgram(program);
@@ -215,7 +255,7 @@ void draw()
         mesh.draw();
     }
 
-    // -  - - Instanced pass ---
+    // -  - - Pass 3: Instanced pass ---
     glUseProgram(instancedProgram);
 
     glActiveTexture(GL_TEXTURE0);
@@ -225,4 +265,15 @@ void draw()
     {
         mesh.draw();
     }
+    colorFramebuffer.unbind();
+
+    // --- Pass 4: FXAA post-process pass ---
+    glDisable(GL_DEPTH_TEST);
+    glUseProgram(fxaaProgram);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, colorFramebuffer.colorTexture);
+    glUniform2f(uTexelSize, 1.0f / 800.0f, 1.0f / 600.0f);
+    glUniform1i(uColorTexture, 0);
+    quad.draw();
+    glEnable(GL_DEPTH_TEST);
 }
