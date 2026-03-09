@@ -82,10 +82,10 @@ GLuint compileShader(GLenum type, const char *src)
     return shader;
 }
 
-void initRenderer()
+void InitProgram(GLuint &program, const char *vertPath, const char *fragPath)
 {
-    std::string vertStr = loadFile("shaders/basic.vert");
-    std::string fragStr = loadFile("shaders/basic.frag");
+    std::string vertStr = loadFile(vertPath);
+    std::string fragStr = loadFile(fragPath);
     const char *vertSrc = vertStr.c_str();
     const char *fragSrc = fragStr.c_str();
 
@@ -95,7 +95,11 @@ void initRenderer()
     glAttachShader(program, vert);
     glAttachShader(program, frag);
     glLinkProgram(program);
-    glUseProgram(program);
+}
+
+void initRenderer()
+{
+    InitProgram(program, "shaders/basic.vert", "shaders/basic.frag");
 
     uModel = glGetUniformLocation(program, "uModel");
 
@@ -147,18 +151,7 @@ void initRenderer()
 
 void initInstancedProgram()
 {
-    std::string vertStr = loadFile("shaders/instanced.vert");
-    std::string fragStr = loadFile("shaders/basic.frag"); // reuse existing frag shader
-    const char *vertSrc = vertStr.c_str();
-    const char *fragSrc = fragStr.c_str();
-
-    GLuint vert = compileShader(GL_VERTEX_SHADER, vertSrc);
-    GLuint frag = compileShader(GL_FRAGMENT_SHADER, fragSrc);
-    instancedProgram = glCreateProgram();
-    glAttachShader(instancedProgram, vert);
-    glAttachShader(instancedProgram, frag);
-    glLinkProgram(instancedProgram);
-    glUseProgram(instancedProgram);
+    InitProgram(instancedProgram, "shaders/instanced.vert", "shaders/basic.frag");
 
     uShadowMapInstanced = glGetUniformLocation(instancedProgram, "uShadowMap");
     GLuint lightIndex = glGetUniformBlockIndex(instancedProgram, "Light");
@@ -170,34 +163,13 @@ void initInstancedProgram()
 
 void initInstancedShadowProgram()
 {
-    std::string vertStr = loadFile("shaders/instanced_shadow.vert");
-    std::string fragStr = loadFile("shaders/shadow.frag"); // reuse shadow frag
-    const char *vertSrc = vertStr.c_str();
-    const char *fragSrc = fragStr.c_str();
-
-    GLuint vert = compileShader(GL_VERTEX_SHADER, vertSrc);
-    GLuint frag = compileShader(GL_FRAGMENT_SHADER, fragSrc);
-    instancedShadowProgram = glCreateProgram();
-    glAttachShader(instancedShadowProgram, vert);
-    glAttachShader(instancedShadowProgram, frag);
-    glLinkProgram(instancedShadowProgram);
-
+    InitProgram(instancedShadowProgram, "shaders/instanced_shadow.vert", "shaders/shadow.frag");
     uLightSpaceMatrixInstancedShadow = glGetUniformLocation(instancedShadowProgram, "uLightSpaceMatrix");
 }
 
 void initSkyboxProgram()
 {
-    std::string vertStr = loadFile("shaders/skybox.vert");
-    std::string fragStr = loadFile("shaders/skybox.frag");
-    const char *vertSrc = vertStr.c_str();
-    const char *fragSrc = fragStr.c_str();
-
-    GLuint vert = compileShader(GL_VERTEX_SHADER, vertSrc);
-    GLuint frag = compileShader(GL_FRAGMENT_SHADER, fragSrc);
-    skyboxProgram = glCreateProgram();
-    glAttachShader(skyboxProgram, vert);
-    glAttachShader(skyboxProgram, frag);
-    glLinkProgram(skyboxProgram);
+    InitProgram(skyboxProgram, "shaders/skybox.vert", "shaders/skybox.frag");
 
     GLuint camIndex = glGetUniformBlockIndex(skyboxProgram, "Camera");
     glUniformBlockBinding(skyboxProgram, camIndex, 0);
@@ -210,17 +182,7 @@ void initSkyboxProgram()
 
 void initShadowProgram()
 {
-    std::string vertStr = loadFile("shaders/shadow.vert");
-    std::string fragStr = loadFile("shaders/shadow.frag");
-    const char *vertSrc = vertStr.c_str();
-    const char *fragSrc = fragStr.c_str();
-
-    GLuint vert = compileShader(GL_VERTEX_SHADER, vertSrc);
-    GLuint frag = compileShader(GL_FRAGMENT_SHADER, fragSrc);
-    shadowProgram = glCreateProgram();
-    glAttachShader(shadowProgram, vert);
-    glAttachShader(shadowProgram, frag);
-    glLinkProgram(shadowProgram);
+    InitProgram(shadowProgram, "shaders/shadow.vert", "shaders/shadow.frag");
 
     uLightSpaceMatrixShadow = glGetUniformLocation(shadowProgram, "uLightSpaceMatrix");
     uModelShadow = glGetUniformLocation(shadowProgram, "uModel");
@@ -228,17 +190,7 @@ void initShadowProgram()
 
 void initFXAAProgram()
 {
-    std::string vertStr = loadFile("shaders/fxaa.vert");
-    std::string fragStr = loadFile("shaders/fxaa.frag");
-    const char *vertSrc = vertStr.c_str();
-    const char *fragSrc = fragStr.c_str();
-
-    GLuint vert = compileShader(GL_VERTEX_SHADER, vertSrc);
-    GLuint frag = compileShader(GL_FRAGMENT_SHADER, fragSrc);
-    fxaaProgram = glCreateProgram();
-    glAttachShader(fxaaProgram, vert);
-    glAttachShader(fxaaProgram, frag);
-    glLinkProgram(fxaaProgram);
+    InitProgram(fxaaProgram, "shaders/fxaa.vert", "shaders/fxaa.frag");
 
     uColorTexture = glGetUniformLocation(fxaaProgram, "uColorTexture");
     uTexelSize = glGetUniformLocation(fxaaProgram, "uTexelSize");
@@ -276,7 +228,7 @@ void draw()
     skybox.draw();
     glDepthMask(GL_TRUE); // re-enable
 
-    // --- Pass 2: main pass ---
+    // --- Pass 3: main pass ---
     glUseProgram(program);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, shadowFramebuffer.depthTexture);
@@ -287,7 +239,7 @@ void draw()
         mesh.draw();
     }
 
-    // -  - - Pass 3: Instanced pass ---
+    // -  - - Pass 4: Instanced pass ---
     glUseProgram(instancedProgram);
 
     glActiveTexture(GL_TEXTURE0);
@@ -299,7 +251,7 @@ void draw()
     }
     colorFramebuffer.unbind();
 
-    // --- Pass 4: FXAA post-process pass ---
+    // --- Pass 5: FXAA post-process pass ---
     glDisable(GL_DEPTH_TEST);
     glUseProgram(fxaaProgram);
     glActiveTexture(GL_TEXTURE0);
