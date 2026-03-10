@@ -22,7 +22,7 @@ void SceneNode::addChild(SceneNode *child)
 void SceneNode::draw(glm::mat4 parentMatrix, GLint uModel, GLint uColor)
 {
     glm::mat4 worldMatrix = parentMatrix * transform.getMatrix();
-    for (Mesh *mesh : meshes)
+    for (const auto &mesh : meshes)
     {
         mesh->draw(worldMatrix, uModel, uColor);
     }

@@ -13,7 +13,6 @@ extern GLint uView; // extern camera gets updated from main.cpp atm
 extern GLint uViewInstanced;
 extern GLuint cameraUBO;
 
-extern std::vector<Mesh> meshes;
 extern std::vector<InstancedMesh> instancedMeshes;
 extern std::vector<SceneNode *> sceneNodes;
 

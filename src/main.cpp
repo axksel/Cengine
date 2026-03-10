@@ -6,6 +6,7 @@
 #include "renderer.h"
 #include "mesh.h"
 #include "instancedMesh.h"
+#include <memory>
 
 #ifdef __INTELLISENSE__
 #define GL_UNIFORM_BUFFER 0
@@ -114,19 +115,17 @@ int main()
     plane.load("models/plane.obj");
     plane.transform.position = glm::vec3(0.0f, -1.0f, 0.0f);
     plane.color = glm::vec3(0.5f, 0.5f, 0.5f); // Gray colorw
-    meshes.push_back(plane);
 
-    Mesh head;
-    head.load("models/animal-horse.obj");
-    head.transform.position = glm::vec3(1.0f, 0.0f, 0.0f);
-    head.color = glm::vec3(1.0f, 0.2f, 0.3f); // Red color
-    meshes.push_back(head);
+    auto head = std::make_shared<Mesh>();
+    head->load("models/animal-horse.obj");
+    head->transform.position = glm::vec3(1.0f, 0.0f, 0.0f);
+    head->color = glm::vec3(1.0f, 0.2f, 0.3f); // Red color
 
     SceneNode firstNode;
-    firstNode.meshes.push_back(&head);
+    firstNode.meshes.push_back(head);
     sceneNodes.push_back(&firstNode);
     SceneNode secondNode;
-    secondNode.meshes.push_back(&head);
+    secondNode.meshes.push_back(head);
     firstNode.addChild(&secondNode);
     secondNode.transform.position = glm::vec3(0.0f, 1.0f, 0.0f);
 

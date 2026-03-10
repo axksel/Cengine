@@ -3,11 +3,12 @@
 #include <vector>
 #include "mesh.h"
 #include "transform.h"
+#include <memory>
 
 struct SceneNode
 {
     Transform transform;
-    std::vector<Mesh *> meshes;
+    std::vector<std::shared_ptr<Mesh>> meshes;
     std::vector<SceneNode *> children;
     SceneNode *parent = nullptr;
 

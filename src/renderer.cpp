@@ -59,7 +59,6 @@ GLuint oceanProgram;
 GLint uOceanTime;
 Plane oceanPlane;
 
-std::vector<Mesh> meshes;
 std::vector<InstancedMesh> instancedMeshes;
 std::vector<SceneNode *> sceneNodes;
 
