@@ -108,6 +108,7 @@ int main()
     initShadowProgram();
     initFXAAProgram();
     initSkyboxProgram();
+    initOceanProgram();
 
     Mesh plane;
     plane.load("models/plane.obj");

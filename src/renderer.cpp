@@ -15,6 +15,7 @@
 #include "instancedMesh.h"
 #include "fullscreenQuad.h"
 #include "skybox.h"
+#include "plane.h"
 
 #ifdef __INTELLISENSE__
 #define glBindVertexArray(x)
@@ -53,6 +54,10 @@ GLint uTexelSize;
 
 GLuint skyboxProgram;
 Skybox skybox;
+
+GLuint oceanProgram;
+GLint uOceanTime;
+Plane oceanPlane;
 
 std::vector<Mesh> meshes;
 std::vector<InstancedMesh> instancedMeshes;
@@ -184,6 +189,20 @@ void initSkyboxProgram()
     skybox.init();
 }
 
+void initOceanProgram()
+{
+    InitProgram(oceanProgram, "shaders/ocean.vert", "shaders/ocean.frag");
+
+    GLuint camIndex = glGetUniformBlockIndex(oceanProgram, "Camera");
+    glUniformBlockBinding(oceanProgram, camIndex, 0);
+
+    GLuint lightIndex = glGetUniformBlockIndex(oceanProgram, "Light");
+    glUniformBlockBinding(oceanProgram, lightIndex, 1);
+
+    uOceanTime = glGetUniformLocation(oceanProgram, "uTime");
+    oceanPlane.init(100, 10);
+}
+
 void initShadowProgram()
 {
     InitProgram(shadowProgram, "shaders/shadow.vert", "shaders/shadow.frag");
@@ -205,7 +224,7 @@ void initFXAAProgram()
 
 void draw()
 {
-
+    float time = (float)emscripten_get_now() / 5000.0f;
     // --- Pass 1: shadow pass ---
     shadowFramebuffer.bind();
     glClear(GL_DEPTH_BUFFER_BIT);
@@ -242,6 +261,9 @@ void draw()
         glUniform3fv(uColor, 1, glm::value_ptr(mesh.color));
         mesh.draw();
     }
+    glUseProgram(oceanProgram);
+    glUniform1f(uOceanTime, time); // needs time passed in somehow
+    oceanPlane.draw();
 
     // -  - - Pass 4: Instanced pass ---
     glUseProgram(instancedProgram);
