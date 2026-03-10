@@ -61,6 +61,7 @@ Plane oceanPlane;
 
 std::vector<Mesh> meshes;
 std::vector<InstancedMesh> instancedMeshes;
+std::vector<SceneNode *> sceneNodes;
 
 std::string loadFile(const std::string &path)
 {
@@ -229,10 +230,9 @@ void draw()
     shadowFramebuffer.bind();
     glClear(GL_DEPTH_BUFFER_BIT);
     glUseProgram(shadowProgram);
-    for (Mesh &mesh : meshes)
+    for (SceneNode *node : sceneNodes)
     {
-        glUniformMatrix4fv(uModelShadow, 1, GL_FALSE, glm::value_ptr(mesh.transform.getMatrix()));
-        mesh.draw();
+        node->draw(glm::mat4(1.0f), uModelShadow, -1); // -1 since shadow shader doesn't use color
     }
     glUseProgram(instancedShadowProgram);
     for (InstancedMesh &mesh : instancedMeshes)
@@ -255,11 +255,9 @@ void draw()
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, shadowFramebuffer.depthTexture);
     glUniform1i(uShadowMap, 0); // shadow map is texture unit 0
-    for (Mesh &mesh : meshes)
+    for (SceneNode *node : sceneNodes)
     {
-        glUniformMatrix4fv(uModel, 1, GL_FALSE, glm::value_ptr(mesh.transform.getMatrix()));
-        glUniform3fv(uColor, 1, glm::value_ptr(mesh.color));
-        mesh.draw();
+        node->draw(glm::mat4(1.0f), uModel, uColor);
     }
     glUseProgram(oceanProgram);
     glUniform1f(uOceanTime, time); // needs time passed in somehow

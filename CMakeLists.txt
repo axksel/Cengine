@@ -12,7 +12,8 @@ add_executable(index src/main.cpp
                 src/colorFramebuffer.cpp
                 src/fullscreenQuad.cpp
                 src/skybox.cpp
-                src/plane.cpp)
+                src/plane.cpp
+                src/sceneNode.cpp)
 
 #external stuff (Vendors?)
 target_include_directories(index PRIVATE vendor)

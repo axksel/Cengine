@@ -14,5 +14,5 @@ struct Mesh
     glm::vec3 color = glm::vec3(1.0f);
 
     void load(const std::string &path);
-    void draw();
+    void draw(glm::mat4 modelMatrix, GLint uModel, GLint uColor);
 };

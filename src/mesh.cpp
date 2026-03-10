@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <stdio.h>
+#include <glm/gtc/type_ptr.hpp>
 
 #ifdef __INTELLISENSE__
 #define glBindVertexArray(x)
@@ -40,8 +41,14 @@ void Mesh::load(const std::string &path)
     printf("Loaded %s: %zu vertices, %zu indices\n", path.c_str(), data.vertices.size() / 6, data.indices.size());
 }
 
-void Mesh::draw()
+void Mesh::draw(glm::mat4 modelMatrix, GLint uModel, GLint uColor)
 {
+    glUniformMatrix4fv(uModel, 1, GL_FALSE, glm::value_ptr(modelMatrix));
+    if (uColor != -1) // check if shader uses color
+    {
+        glUniform3fv(uColor, 1, glm::value_ptr(color));
+    }
+
     glBindVertexArray(vao);
     glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, nullptr);
 }

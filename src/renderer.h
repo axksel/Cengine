@@ -5,6 +5,7 @@
 #include "light.h"
 #include "shadowFramebuffer.h"
 #include "instancedMesh.h"
+#include "sceneNode.h"
 
 extern ShadowFramebuffer shadowFramebuffer;
 
@@ -14,6 +15,7 @@ extern GLuint cameraUBO;
 
 extern std::vector<Mesh> meshes;
 extern std::vector<InstancedMesh> instancedMeshes;
+extern std::vector<SceneNode *> sceneNodes;
 
 extern GLuint program;
 extern GLuint instancedProgram;
