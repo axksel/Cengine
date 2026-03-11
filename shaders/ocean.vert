@@ -50,7 +50,7 @@ void main()
     fragNormal = normalize(cross(posZ - pos, posX - pos));
     fragPos = pos;
 
-    fragViewPos = (uView * vec4(pos, 1.0)).xyz;
+    fragViewPos = inverse(uView)[3].xyz;
 
     gl_Position = uProjection * uView * vec4(pos, 1.0);
 }

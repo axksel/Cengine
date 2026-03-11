@@ -13,6 +13,27 @@ layout(std140) uniform Light {
     vec3 uLightColor;
 };
 
+uniform sampler2D uShadowMap;
+
+float shadow(vec3 fragPos) {
+    vec4 fragPosLightSpace = uLightSpaceMatrix * vec4(fragPos, 1.0);
+    vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
+    projCoords = projCoords * 0.5 + 0.5;
+
+    if (projCoords.z > 1.0) return 0.0;
+
+    float currentDepth = projCoords.z;
+    float shadow = 0.0;
+    vec2 texelSize = 1.0 / vec2(textureSize(uShadowMap, 0));
+
+    for (int x = -1; x <= 1; x++)
+        for (int y = -1; y <= 1; y++)
+            shadow += currentDepth > texture(uShadowMap, projCoords.xy + vec2(x, y) * texelSize).r + 0.005 ? 1.0 : 0.0;
+
+    shadow /= 9.0;
+    return shadow;
+}
+
 void main()
 {
     // lighting
@@ -36,7 +57,8 @@ void main()
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), 128.0);
     vec3 specular = spec * vec3(1.0, 1.0, 1.0) * 0.8;
 
+     float shadowFactor = shadow(fragPos);
 
-    vec3 result = waterColor*ambient + specular;
+    vec3 result = (ambient * (1.0 - shadowFactor * 0.5) + specular * (1.0 - shadowFactor)) * waterColor;
     fragColor = vec4(result, 1.0);
 }

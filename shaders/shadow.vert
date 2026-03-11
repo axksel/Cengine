@@ -2,7 +2,11 @@
 layout(location = 0) in vec3 aPos;
 
 uniform mat4 uModel;
-uniform mat4 uLightSpaceMatrix;
+layout(std140) uniform Light {
+    mat4 uLightSpaceMatrix;
+    vec3 uLightPos;
+    vec3 uLightColor;
+};
 
 void main() {
     gl_Position = uLightSpaceMatrix * uModel * vec4(aPos, 1.0);

@@ -81,7 +81,7 @@ void mainLoop()
         // If free camera is disabled, use player controls instead
         float time = (float)emscripten_get_now() / 5000.0f;
         updatePlayer(keys, time);
-        glm::vec3 camPos = playerPos + glm::vec3(0.0f, 10.0f, -10.0f);
+        glm::vec3 camPos = playerPos + glm::vec3(0.0f, 6.0f, -10.0f);
         view = glm::lookAt(camPos, playerPos, glm::vec3(0.0f, 1.0f, 0.0f));
     }
     else

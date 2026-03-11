@@ -27,6 +27,7 @@ set_property(TARGET index PROPERTY LINK_DEPENDS
     ${CMAKE_SOURCE_DIR}/shaders/instanced_shadow.vert
     ${CMAKE_SOURCE_DIR}/shaders/ocean.vert
     ${CMAKE_SOURCE_DIR}/shaders/ocean.frag
+    ${CMAKE_SOURCE_DIR}/shaders/shadow.vert
 
 )
 

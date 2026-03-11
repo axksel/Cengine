@@ -16,6 +16,7 @@
 #include "fullscreenQuad.h"
 #include "skybox.h"
 #include "plane.h"
+#include "playerControls.h"
 
 #ifdef __INTELLISENSE__
 #define glBindVertexArray(x)
@@ -58,6 +59,7 @@ Skybox skybox;
 GLuint oceanProgram;
 GLint uOceanTime;
 Plane oceanPlane;
+GLint uShadowMapOcean;
 
 std::vector<InstancedMesh> instancedMeshes;
 std::vector<SceneNode *> sceneNodes;
@@ -133,7 +135,6 @@ void initRenderer()
     glUniformBlockBinding(program, camIndex, 0);
 
     // Light and shadow setup and UBO
-    light.update();
     shadowFramebuffer.init(2048, 2048);
     uShadowMap = glGetUniformLocation(program, "uShadowMap");
 
@@ -192,7 +193,7 @@ void initSkyboxProgram()
 void initOceanProgram()
 {
     InitProgram(oceanProgram, "shaders/ocean.vert", "shaders/ocean.frag");
-
+    uShadowMapOcean = glGetUniformLocation(oceanProgram, "uShadowMap");
     GLuint camIndex = glGetUniformBlockIndex(oceanProgram, "Camera");
     glUniformBlockBinding(oceanProgram, camIndex, 0);
 
@@ -207,9 +208,9 @@ void initShadowProgram()
 {
     InitProgram(shadowProgram, "shaders/shadow.vert", "shaders/shadow.frag");
 
-    GLint uLightSpaceMatrixShadow = glGetUniformLocation(shadowProgram, "uLightSpaceMatrix");
     glUseProgram(shadowProgram);
-    glUniformMatrix4fv(uLightSpaceMatrixShadow, 1, GL_FALSE, glm::value_ptr(light.lightSpaceMatrix));
+    GLuint lightIndex = glGetUniformBlockIndex(shadowProgram, "Light");
+    glUniformBlockBinding(shadowProgram, lightIndex, 1);
     uModelShadow = glGetUniformLocation(shadowProgram, "uModel");
 }
 
@@ -225,6 +226,11 @@ void initFXAAProgram()
 void draw()
 {
     float time = (float)emscripten_get_now() / 5000.0f;
+
+    light.update(playerPos);
+    glBindBuffer(GL_UNIFORM_BUFFER, lightUBO);
+    glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(light.lightSpaceMatrix));
+    glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::vec4), glm::value_ptr(light.position));
     // --- Pass 1: shadow pass ---
     shadowFramebuffer.bind();
     glClear(GL_DEPTH_BUFFER_BIT);
@@ -259,7 +265,10 @@ void draw()
         node->draw(glm::mat4(1.0f), uModel, uColor);
     }
     glUseProgram(oceanProgram);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, shadowFramebuffer.depthTexture);
     glUniform1f(uOceanTime, time); // needs time passed in somehow
+    glUniform1i(uShadowMapOcean, 0);
     oceanPlane.draw();
 
     // -  - - Pass 4: Instanced pass ---
