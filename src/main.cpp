@@ -7,6 +7,7 @@
 #include "mesh.h"
 #include "instancedMesh.h"
 #include <memory>
+#include "playerControls.h"
 
 #ifdef __INTELLISENSE__
 #define GL_UNIFORM_BUFFER 0
@@ -18,6 +19,9 @@ glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
 float yaw = -90.0f;
 float pitch = 0.0f;
+
+bool freeCamera = false;
+bool spaceWasDown = false;
 
 // Global key state
 bool keys[256] = {};
@@ -65,22 +69,40 @@ bool mouseClick(int type, const EmscriptenMouseEvent *e, void *userData)
 
 void mainLoop()
 {
-    float speed = 0.05f;
-    if (keys[87])
-        cameraPos += speed * cameraFront; // W
-    if (keys[83])
-        cameraPos -= speed * cameraFront; // S
-    if (keys[65])
-        cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * speed; // A
-    if (keys[68])
-        cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * speed; // D
-    if (keys[81])
-        cameraPos -= speed * cameraUp; // Q
-    if (keys[69])
-        cameraPos += speed * cameraUp; // E
 
-    // Recalculate view matrix
-    glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+    bool spaceDown = keys[32];
+    if (spaceDown && !spaceWasDown)
+        freeCamera = !freeCamera;
+    spaceWasDown = spaceDown;
+
+    glm::mat4 view;
+    if (freeCamera)
+    {
+        // If free camera is disabled, use player controls instead
+        float time = (float)emscripten_get_now() / 5000.0f;
+        updatePlayer(keys, time);
+        glm::vec3 camPos = playerPos + glm::vec3(0.0f, 10.0f, -10.0f);
+        view = glm::lookAt(camPos, playerPos, glm::vec3(0.0f, 1.0f, 0.0f));
+    }
+    else
+    {
+        float speed = 0.05f;
+        if (keys[87])
+            cameraPos += speed * cameraFront; // W
+        if (keys[83])
+            cameraPos -= speed * cameraFront; // S
+        if (keys[65])
+            cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * speed; // A
+        if (keys[68])
+            cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * speed; // D
+        if (keys[81])
+            cameraPos -= speed * cameraUp; // Q
+        if (keys[69])
+            cameraPos += speed * cameraUp; // E
+
+        // Recalculate view matrix
+        view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+    }
     glBindBuffer(GL_UNIFORM_BUFFER, cameraUBO);
     glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(view));
 
@@ -116,18 +138,26 @@ int main()
     plane.transform.position = glm::vec3(0.0f, -1.0f, 0.0f);
     plane.color = glm::vec3(0.5f, 0.5f, 0.5f); // Gray colorw
 
+    auto ship = std::make_shared<Mesh>();
+    ship->load("models/ship-pirate-medium.obj");
+    ship->transform.position = glm::vec3(1.0f, 0.0f, 0.0f);
+    ship->transform.scale = glm::vec3(0.1f);   // scale down the ship
+    ship->color = glm::vec3(1.0f, 0.2f, 0.3f); // Red color
+
     auto head = std::make_shared<Mesh>();
     head->load("models/animal-horse.obj");
-    head->transform.position = glm::vec3(1.0f, 0.0f, 0.0f);
     head->color = glm::vec3(1.0f, 0.2f, 0.3f); // Red color
 
     SceneNode *firstNode = new SceneNode();
-    firstNode->meshes.push_back(head);
+    firstNode->meshes.push_back(ship);
+    firstNode->transform.scale = glm::vec3(0.1f);
     sceneNodes.push_back(firstNode);
     SceneNode *secondNode = new SceneNode();
     secondNode->meshes.push_back(head);
     firstNode->addChild(secondNode);
     secondNode->transform.position = glm::vec3(0.0f, 1.0f, 0.0f);
+
+    initPlayer(firstNode);
 
     InstancedMesh spheres;
     spheres.load("models/sphere.obj");

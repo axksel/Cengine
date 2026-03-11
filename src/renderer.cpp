@@ -200,7 +200,7 @@ void initOceanProgram()
     glUniformBlockBinding(oceanProgram, lightIndex, 1);
 
     uOceanTime = glGetUniformLocation(oceanProgram, "uTime");
-    oceanPlane.init(100, 10);
+    oceanPlane.init(200, 30);
 }
 
 void initShadowProgram()

@@ -13,7 +13,9 @@ add_executable(index src/main.cpp
                 src/fullscreenQuad.cpp
                 src/skybox.cpp
                 src/plane.cpp
-                src/sceneNode.cpp)
+                src/sceneNode.cpp
+                src/playerControls.cpp
+                src/waves.cpp)
 
 #external stuff (Vendors?)
 target_include_directories(index PRIVATE vendor)
