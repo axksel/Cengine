@@ -44,3 +44,9 @@ void ShadowFramebuffer::unbind()
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glViewport(0, 0, 800, 600);
 }
+
+ShadowFramebuffer::~ShadowFramebuffer()
+{
+    glDeleteFramebuffers(1, &fbo);
+    glDeleteTextures(1, &depthTexture);
+}

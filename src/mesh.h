@@ -15,4 +15,5 @@ struct Mesh
 
     void load(const std::string &path);
     void draw(glm::mat4 modelMatrix, GLint uModel, GLint uColor);
+    ~Mesh();
 };

@@ -3,6 +3,7 @@
 #ifdef __INTELLISENSE__
 #define glBindVertexArray(x)
 #define glGenVertexArrays(x, y)
+#define glDeleteVertexArrays(x, y)
 #endif
 
 void FullScreenQuad::init()
@@ -39,4 +40,10 @@ void FullScreenQuad::draw()
 {
     glBindVertexArray(vao);
     glDrawArrays(GL_TRIANGLES, 0, 6);
+}
+
+FullScreenQuad::~FullScreenQuad()
+{
+    glDeleteVertexArrays(1, &vao);
+    glDeleteBuffers(1, &vbo);
 }

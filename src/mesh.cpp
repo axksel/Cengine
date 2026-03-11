@@ -10,6 +10,7 @@
 #ifdef __INTELLISENSE__
 #define glBindVertexArray(x)
 #define glGenVertexArrays(x, y)
+#define glDeleteVertexArrays(x, y)
 #endif
 
 void Mesh::load(const std::string &path)
@@ -51,4 +52,11 @@ void Mesh::draw(glm::mat4 modelMatrix, GLint uModel, GLint uColor)
 
     glBindVertexArray(vao);
     glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, nullptr);
+}
+
+Mesh::~Mesh()
+{
+    glDeleteVertexArrays(1, &vao);
+    glDeleteBuffers(1, &vbo);
+    glDeleteBuffers(1, &ebo);
 }

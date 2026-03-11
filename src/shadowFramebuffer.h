@@ -11,4 +11,5 @@ struct ShadowFramebuffer
     void init(int width, int height);
     void bind();
     void unbind();
+    ~ShadowFramebuffer();
 };

@@ -3,6 +3,7 @@
 #ifdef __INTELLISENSE__
 #define glBindVertexArray(x)
 #define glGenVertexArrays(x, y)
+#define glDeleteVertexArrays(x, y)
 #endif
 
 void Skybox::init()
@@ -35,4 +36,10 @@ void Skybox::draw()
 {
     glBindVertexArray(vao);
     glDrawArrays(GL_TRIANGLES, 0, 36);
+}
+
+Skybox::~Skybox()
+{
+    glDeleteVertexArrays(1, &vao);
+    glDeleteBuffers(1, &vbo);
 }

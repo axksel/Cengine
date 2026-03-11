@@ -4,6 +4,7 @@
 #ifdef __INTELLISENSE__
 #define glBindVertexArray(x)
 #define glGenVertexArrays(x, y)
+#define glDeleteVertexArrays(x, y)
 #endif
 
 void Plane::init(int resolution, int size)
@@ -65,4 +66,11 @@ void Plane::draw()
 {
     glBindVertexArray(vao);
     glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0);
+}
+
+Plane::~Plane()
+{
+    glDeleteVertexArrays(1, &vao);
+    glDeleteBuffers(1, &vbo);
+    glDeleteBuffers(1, &ebo);
 }

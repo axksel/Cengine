@@ -13,4 +13,5 @@ struct ColorFramebuffer
     void init(int width, int height);
     void bind();
     void unbind();
+    ~ColorFramebuffer();
 };

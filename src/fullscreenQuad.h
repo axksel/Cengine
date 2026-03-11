@@ -8,4 +8,5 @@ struct FullScreenQuad
 
     void init();
     void draw();
+    ~FullScreenQuad();
 };

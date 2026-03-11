@@ -8,4 +8,5 @@ struct Skybox
 
     void init();
     void draw();
+    ~Skybox();
 };

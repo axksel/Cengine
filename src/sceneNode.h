@@ -15,4 +15,5 @@ struct SceneNode
     glm::mat4 getWorldMatrix();
     void addChild(SceneNode *child);
     void draw(glm::mat4 parentMatrix, GLint uModel, GLint uColor);
+    void destroy(std::vector<SceneNode *> &sceneNodes);
 };

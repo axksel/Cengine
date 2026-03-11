@@ -121,13 +121,13 @@ int main()
     head->transform.position = glm::vec3(1.0f, 0.0f, 0.0f);
     head->color = glm::vec3(1.0f, 0.2f, 0.3f); // Red color
 
-    SceneNode firstNode;
-    firstNode.meshes.push_back(head);
-    sceneNodes.push_back(&firstNode);
-    SceneNode secondNode;
-    secondNode.meshes.push_back(head);
-    firstNode.addChild(&secondNode);
-    secondNode.transform.position = glm::vec3(0.0f, 1.0f, 0.0f);
+    SceneNode *firstNode = new SceneNode();
+    firstNode->meshes.push_back(head);
+    sceneNodes.push_back(firstNode);
+    SceneNode *secondNode = new SceneNode();
+    secondNode->meshes.push_back(head);
+    firstNode->addChild(secondNode);
+    secondNode->transform.position = glm::vec3(0.0f, 1.0f, 0.0f);
 
     InstancedMesh spheres;
     spheres.load("models/sphere.obj");

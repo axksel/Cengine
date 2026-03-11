@@ -57,3 +57,10 @@ void ColorFramebuffer::unbind()
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glViewport(0, 0, 800, 600);
 }
+
+ColorFramebuffer::~ColorFramebuffer()
+{
+    glDeleteFramebuffers(1, &fbo);
+    glDeleteTextures(1, &depthTexture);
+    glDeleteTextures(1, &colorTexture);
+}

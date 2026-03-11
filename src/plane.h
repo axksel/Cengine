@@ -10,4 +10,5 @@ struct Plane
 
     void init(int resolution, int size);
     void draw();
+    ~Plane();
 };
