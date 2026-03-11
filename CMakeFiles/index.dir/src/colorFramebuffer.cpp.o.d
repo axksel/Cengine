@@ -1,0 +1,32 @@
+CMakeFiles/index.dir/src/colorFramebuffer.cpp.o: \
+  /home/runner/work/Cengine/Cengine/src/colorFramebuffer.cpp \
+  /home/runner/work/Cengine/Cengine/src/colorFramebuffer.h \
+  /home/runner/work/_temp/9b0ae48e-0048-482b-9194-8759b450b7bf/emsdk-main/upstream/emscripten/cache/sysroot/include/GLES3/gl3.h \
+  /home/runner/work/_temp/9b0ae48e-0048-482b-9194-8759b450b7bf/emsdk-main/upstream/emscripten/cache/sysroot/include/GLES3/gl3platform.h \
+  /home/runner/work/_temp/9b0ae48e-0048-482b-9194-8759b450b7bf/emsdk-main/upstream/emscripten/cache/sysroot/include/KHR/khrplatform.h \
+  /home/runner/work/_temp/9b0ae48e-0048-482b-9194-8759b450b7bf/emsdk-main/upstream/lib/clang/23/include/stdint.h \
+  /home/runner/work/_temp/9b0ae48e-0048-482b-9194-8759b450b7bf/emsdk-main/upstream/emscripten/cache/sysroot/include/stdint.h \
+  /home/runner/work/_temp/9b0ae48e-0048-482b-9194-8759b450b7bf/emsdk-main/upstream/emscripten/cache/sysroot/include/bits/alltypes.h \
+  /home/runner/work/_temp/9b0ae48e-0048-482b-9194-8759b450b7bf/emsdk-main/upstream/emscripten/cache/sysroot/include/bits/stdint.h \
+  /home/runner/work/_temp/9b0ae48e-0048-482b-9194-8759b450b7bf/emsdk-main/upstream/emscripten/cache/sysroot/include/c++/v1/stdio.h \
+  /home/runner/work/_temp/9b0ae48e-0048-482b-9194-8759b450b7bf/emsdk-main/upstream/emscripten/cache/sysroot/include/c++/v1/__config \
+  /home/runner/work/_temp/9b0ae48e-0048-482b-9194-8759b450b7bf/emsdk-main/upstream/emscripten/cache/sysroot/include/c++/v1/__config_site \
+  /home/runner/work/_temp/9b0ae48e-0048-482b-9194-8759b450b7bf/emsdk-main/upstream/emscripten/cache/sysroot/include/c++/v1/__configuration/abi.h \
+  /home/runner/work/_temp/9b0ae48e-0048-482b-9194-8759b450b7bf/emsdk-main/upstream/emscripten/cache/sysroot/include/c++/v1/__configuration/compiler.h \
+  /home/runner/work/_temp/9b0ae48e-0048-482b-9194-8759b450b7bf/emsdk-main/upstream/emscripten/cache/sysroot/include/c++/v1/__configuration/platform.h \
+  /home/runner/work/_temp/9b0ae48e-0048-482b-9194-8759b450b7bf/emsdk-main/upstream/emscripten/cache/sysroot/include/c++/v1/__configuration/availability.h \
+  /home/runner/work/_temp/9b0ae48e-0048-482b-9194-8759b450b7bf/emsdk-main/upstream/emscripten/cache/sysroot/include/c++/v1/__configuration/language.h \
+  /home/runner/work/_temp/9b0ae48e-0048-482b-9194-8759b450b7bf/emsdk-main/upstream/emscripten/cache/sysroot/include/stdio.h \
+  /home/runner/work/_temp/9b0ae48e-0048-482b-9194-8759b450b7bf/emsdk-main/upstream/emscripten/cache/sysroot/include/wasi/api.h \
+  /home/runner/work/_temp/9b0ae48e-0048-482b-9194-8759b450b7bf/emsdk-main/upstream/emscripten/cache/sysroot/include/c++/v1/stddef.h \
+  /home/runner/work/_temp/9b0ae48e-0048-482b-9194-8759b450b7bf/emsdk-main/upstream/lib/clang/23/include/stddef.h \
+  /home/runner/work/_temp/9b0ae48e-0048-482b-9194-8759b450b7bf/emsdk-main/upstream/emscripten/cache/sysroot/include/stddef.h \
+  /home/runner/work/_temp/9b0ae48e-0048-482b-9194-8759b450b7bf/emsdk-main/upstream/lib/clang/23/include/__stddef_header_macro.h \
+  /home/runner/work/_temp/9b0ae48e-0048-482b-9194-8759b450b7bf/emsdk-main/upstream/lib/clang/23/include/__stddef_ptrdiff_t.h \
+  /home/runner/work/_temp/9b0ae48e-0048-482b-9194-8759b450b7bf/emsdk-main/upstream/lib/clang/23/include/__stddef_size_t.h \
+  /home/runner/work/_temp/9b0ae48e-0048-482b-9194-8759b450b7bf/emsdk-main/upstream/lib/clang/23/include/__stddef_wchar_t.h \
+  /home/runner/work/_temp/9b0ae48e-0048-482b-9194-8759b450b7bf/emsdk-main/upstream/lib/clang/23/include/__stddef_null.h \
+  /home/runner/work/_temp/9b0ae48e-0048-482b-9194-8759b450b7bf/emsdk-main/upstream/lib/clang/23/include/__stddef_nullptr_t.h \
+  /home/runner/work/_temp/9b0ae48e-0048-482b-9194-8759b450b7bf/emsdk-main/upstream/lib/clang/23/include/__stddef_max_align_t.h \
+  /home/runner/work/_temp/9b0ae48e-0048-482b-9194-8759b450b7bf/emsdk-main/upstream/lib/clang/23/include/__stddef_offsetof.h \
+  /home/runner/work/_temp/9b0ae48e-0048-482b-9194-8759b450b7bf/emsdk-main/upstream/emscripten/cache/sysroot/include/features.h
