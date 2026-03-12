@@ -76,7 +76,7 @@ void mainLoop()
     spaceWasDown = spaceDown;
 
     glm::mat4 view;
-    if (freeCamera)
+    if (!freeCamera)
     {
         // If free camera is disabled, use player controls instead
         float time = (float)emscripten_get_now() / 5000.0f;
